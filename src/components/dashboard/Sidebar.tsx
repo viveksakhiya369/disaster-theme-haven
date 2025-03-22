@@ -13,18 +13,20 @@ import {
   Users 
 } from "lucide-react";
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface NavItemProps {
   icon: React.ElementType;
   label: string;
+  to: string;
   active?: boolean;
   hasAlert?: boolean;
   onClick?: () => void;
 }
 
-const NavItem = ({ icon: Icon, label, active, hasAlert, onClick }: NavItemProps) => {
+const NavItem = ({ icon: Icon, label, to, active, hasAlert, onClick }: NavItemProps) => {
   return (
     <Button
       variant="ghost"
@@ -35,39 +37,59 @@ const NavItem = ({ icon: Icon, label, active, hasAlert, onClick }: NavItemProps)
           : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
       )}
       onClick={onClick}
+      asChild
     >
-      <div className="flex items-center gap-3">
-        <Icon className="h-5 w-5" />
-        <span className="font-medium">{label}</span>
-      </div>
-      {hasAlert && (
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-destructive animate-pulse-gentle" />
-      )}
-      <div
-        className={cn(
-          "absolute left-0 top-0 h-full w-0.5 bg-sidebar-primary scale-y-0 transition-transform origin-center duration-150 ease-out",
-          active && "scale-y-100"
+      <Link to={to}>
+        <div className="flex items-center gap-3">
+          <Icon className="h-5 w-5" />
+          <span className="font-medium">{label}</span>
+        </div>
+        {hasAlert && (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-destructive animate-pulse-gentle" />
         )}
-      />
+        <div
+          className={cn(
+            "absolute left-0 top-0 h-full w-0.5 bg-sidebar-primary scale-y-0 transition-transform origin-center duration-150 ease-out",
+            active && "scale-y-100"
+          )}
+        />
+      </Link>
     </Button>
   );
 };
 
 const Sidebar = () => {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
+  // Define route paths and their corresponding labels
+  const pathToLabel: Record<string, string> = {
+    "/": "Dashboard",
+    "/alerts": "Alerts",
+    "/incidents": "Incidents",
+    "/map": "Map View",
+    "/personnel": "Personnel",
+    "/resources": "Resources",
+    "/reports": "Reports",
+    "/planning": "Planning",
+    "/contacts": "Contacts",
+    "/settings": "Settings",
+  };
+
+  // Get active item based on current location
+  const activeItem = pathToLabel[location.pathname] || "Dashboard";
+
   const navItems = [
-    { icon: Home, label: "Dashboard", hasAlert: false },
-    { icon: Bell, label: "Alerts", hasAlert: true },
-    { icon: Activity, label: "Incidents", hasAlert: false },
-    { icon: MapPin, label: "Map View", hasAlert: false },
-    { icon: Users, label: "Personnel", hasAlert: false },
-    { icon: Shield, label: "Resources", hasAlert: false },
-    { icon: FileText, label: "Reports", hasAlert: false },
-    { icon: Calendar, label: "Planning", hasAlert: false },
-    { icon: Phone, label: "Contacts", hasAlert: false },
-    { icon: Settings, label: "Settings", hasAlert: false },
+    { icon: Home, label: "Dashboard", to: "/", hasAlert: false },
+    { icon: Bell, label: "Alerts", to: "/alerts", hasAlert: true },
+    { icon: Activity, label: "Incidents", to: "/incidents", hasAlert: false },
+    { icon: MapPin, label: "Map View", to: "/map", hasAlert: false },
+    { icon: Users, label: "Personnel", to: "/personnel", hasAlert: false },
+    { icon: Shield, label: "Resources", to: "/resources", hasAlert: false },
+    { icon: FileText, label: "Reports", to: "/reports", hasAlert: false },
+    { icon: Calendar, label: "Planning", to: "/planning", hasAlert: false },
+    { icon: Phone, label: "Contacts", to: "/contacts", hasAlert: false },
+    { icon: Settings, label: "Settings", to: "/settings", hasAlert: false },
   ];
 
   return (
@@ -79,9 +101,9 @@ const Sidebar = () => {
     >
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
-          <h1 className="text-sidebar-foreground font-semibold text-xl">
+          <Link to="/" className="text-sidebar-foreground font-semibold text-xl">
             Disaster<span className="text-sidebar-primary">Ctrl</span>
-          </h1>
+          </Link>
         )}
         <Button 
           variant="ghost"
@@ -98,9 +120,9 @@ const Sidebar = () => {
             key={item.label}
             icon={item.icon}
             label={collapsed ? "" : item.label}
+            to={item.to}
             active={activeItem === item.label}
             hasAlert={!collapsed && item.hasAlert}
-            onClick={() => setActiveItem(item.label)}
           />
         ))}
       </div>
