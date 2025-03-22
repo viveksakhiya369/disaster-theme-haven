@@ -6,7 +6,8 @@ import { useState } from "react";
 import { alertsData } from "@/data/mockData";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Plus, MapPin, Filter } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, MapPin, Filter, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Select,

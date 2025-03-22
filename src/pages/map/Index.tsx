@@ -25,6 +25,7 @@ interface AlertLocation {
   affectedAreas?: string[];
   population?: number;
   reliefMeasures?: string[];
+  read?: boolean;
 }
 
 const MapViewPage = () => {
@@ -35,9 +36,14 @@ const MapViewPage = () => {
   
   // Simulate fetching alert data with coordinates
   useEffect(() => {
-    // In a real application, this would be fetched from an API
-    // For demo purposes, we're using our expanded alertsData
-    setAlertLocations(alertsData);
+    // Convert alertsData to match the AlertLocation type
+    // We need to ensure that severity is one of "critical", "high", "medium", or "low"
+    const typedAlertData = alertsData.map(alert => ({
+      ...alert,
+      severity: alert.severity as "critical" | "high" | "medium" | "low"
+    }));
+    
+    setAlertLocations(typedAlertData);
     setIsLoading(false);
   }, []);
 

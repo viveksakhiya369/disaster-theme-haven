@@ -7,7 +7,7 @@ export const alertsData = [
     title: "Flash Flood Warning",
     description: "Flash flooding reported in southern districts. Emergency response teams deployed.",
     timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-    severity: "critical",
+    severity: "critical" as const,
     read: false,
     affectedAreas: ["Riverside County", "South District", "Millbrook", "East Valley"],
     population: 125000,
@@ -25,7 +25,7 @@ export const alertsData = [
     title: "Evacuation Notice",
     description: "Voluntary evacuation order issued for coastal areas due to approaching storm.",
     timestamp: new Date(Date.now() - 1000 * 60 * 45), // 45 minutes ago
-    severity: "high",
+    severity: "high" as const,
     read: false,
     affectedAreas: ["Coastal Boulevard", "Marina District", "Harbor View", "Bay Shore"],
     population: 75000,
@@ -42,7 +42,7 @@ export const alertsData = [
     title: "Road Closure",
     description: "Highway 101 closed due to landslide. Use alternate routes.",
     timestamp: new Date(Date.now() - 1000 * 60 * 120), // 2 hours ago
-    severity: "medium",
+    severity: "medium" as const,
     read: true,
     affectedAreas: ["Highway 101 Mile 25-40", "Cliffside Community", "Woodland Heights"],
     population: 30000,
@@ -59,7 +59,7 @@ export const alertsData = [
     title: "Weather Advisory",
     description: "Thunderstorms expected in the evening. Stay indoors if possible.",
     timestamp: new Date(Date.now() - 1000 * 60 * 180), // 3 hours ago
-    severity: "low",
+    severity: "low" as const,
     read: true,
     affectedAreas: ["Metro Area", "Northern Suburbs", "Downtown Core"],
     population: 250000,
