@@ -7,7 +7,7 @@ import { alertsData } from "@/data/mockData";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Filter, Users } from "lucide-react";
+import { Plus, MapPin, Filter, Users, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Select,
@@ -16,10 +16,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { formatDistanceToNow } from "date-fns";
 
 const AlertsPage = () => {
   const [alerts, setAlerts] = useState(alertsData);
   const [severityFilter, setSeverityFilter] = useState<string>("all");
+  const [selectedAlert, setSelectedAlert] = useState<typeof alertsData[0] | null>(null);
   const navigate = useNavigate();
 
   const handleDismissAlert = (id: string) => {
@@ -28,10 +37,13 @@ const AlertsPage = () => {
   };
 
   const handleViewAlert = (id: string) => {
-    setAlerts(alerts.map(alert => 
-      alert.id === id ? { ...alert, read: true } : alert
-    ));
-    toast.info("Opening alert details");
+    const alert = alerts.find(a => a.id === id);
+    if (alert) {
+      setSelectedAlert(alert);
+      setAlerts(alerts.map(a => 
+        a.id === id ? { ...a, read: true } : a
+      ));
+    }
   };
 
   const handleViewOnMap = () => {
@@ -47,6 +59,13 @@ const AlertsPage = () => {
     (sum, alert) => sum + (alert.population || 0), 
     0
   );
+
+  const severityColorMap = {
+    critical: "text-destructive",
+    high: "text-warning",
+    medium: "text-info",
+    low: "text-success",
+  };
 
   return (
     <DashboardLayout>
@@ -124,6 +143,86 @@ const AlertsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Alert Detail Dialog */}
+      <Dialog open={!!selectedAlert} onOpenChange={(open) => !open && setSelectedAlert(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          {selectedAlert && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-2">
+                  <DialogTitle>{selectedAlert.title}</DialogTitle>
+                  <Badge className={`${
+                    selectedAlert.severity === "critical" ? "bg-destructive text-destructive-foreground" :
+                    selectedAlert.severity === "high" ? "bg-warning text-warning-foreground" :
+                    selectedAlert.severity === "medium" ? "bg-info text-info-foreground" :
+                    "bg-success text-success-foreground"
+                  }`}>
+                    {selectedAlert.severity}
+                  </Badge>
+                </div>
+                <DialogDescription>
+                  <span className={severityColorMap[selectedAlert.severity as keyof typeof severityColorMap]}>
+                    Reported {formatDistanceToNow(selectedAlert.timestamp, { addSuffix: true })}
+                  </span>
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-6">
+                <div>
+                  <p className="text-sm mb-4">{selectedAlert.description}</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Affected Areas</h4>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedAlert.affectedAreas?.map((area, index) => (
+                      <Badge key={index} variant="outline" className="bg-background">
+                        {area}
+                      </Badge>
+                    ))}
+                  </div>
+                  {selectedAlert.population && (
+                    <p className="text-sm text-muted-foreground">
+                      <Users className="h-3 w-3 inline mr-1" />
+                      Estimated population affected: <span className="font-medium">{selectedAlert.population.toLocaleString()}</span>
+                    </p>
+                  )}
+                </div>
+                
+                {selectedAlert.reliefMeasures && selectedAlert.reliefMeasures.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Relief Measures</h4>
+                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                      {selectedAlert.reliefMeasures.map((measure, index) => (
+                        <li key={index}>{measure}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {selectedAlert.lat && selectedAlert.lng && (
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    Location: {selectedAlert.lat.toFixed(4)}, {selectedAlert.lng.toFixed(4)}
+                    <Button 
+                      variant="link" 
+                      size="sm" 
+                      className="ml-2"
+                      onClick={() => {
+                        setSelectedAlert(null);
+                        navigate("/map");
+                      }}
+                    >
+                      View on map
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
