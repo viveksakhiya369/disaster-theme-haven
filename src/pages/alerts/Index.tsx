@@ -6,10 +6,12 @@ import { useState } from "react";
 import { alertsData } from "@/data/mockData";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AlertsPage = () => {
   const [alerts, setAlerts] = useState(alertsData);
+  const navigate = useNavigate();
 
   const handleDismissAlert = (id: string) => {
     setAlerts(alerts.filter(alert => alert.id !== id));
@@ -23,6 +25,11 @@ const AlertsPage = () => {
     toast.info("Opening alert details");
   };
 
+  const handleViewOnMap = () => {
+    navigate("/map");
+    toast.info("Viewing alerts on global map");
+  };
+
   return (
     <DashboardLayout>
       <Header 
@@ -33,10 +40,20 @@ const AlertsPage = () => {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Active Alerts</h2>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create Alert
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2"
+              onClick={handleViewOnMap}
+            >
+              <MapPin className="h-4 w-4" />
+              View on Map
+            </Button>
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create Alert
+            </Button>
+          </div>
         </div>
         
         <div className="p-6 rounded-xl glass transition-all duration-300 ease-in-out">
