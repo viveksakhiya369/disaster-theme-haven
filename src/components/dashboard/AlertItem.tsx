@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Bell, Eye, X } from "lucide-react";
+import { Bell, Eye, X, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
 interface AlertItemProps {
@@ -13,6 +13,9 @@ interface AlertItemProps {
   timestamp: Date;
   severity: "critical" | "high" | "medium" | "low";
   read?: boolean;
+  affectedAreas?: string[];
+  population?: number;
+  reliefMeasures?: string[];
   onDismiss?: (id: string) => void;
   onView?: (id: string) => void;
 }
@@ -24,10 +27,14 @@ const AlertItem = ({
   timestamp,
   severity,
   read = false,
+  affectedAreas = [],
+  population,
+  reliefMeasures = [],
   onDismiss,
   onView,
 }: AlertItemProps) => {
   const [isHovering, setIsHovering] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   
   const severityMap = {
     critical: {
@@ -82,6 +89,63 @@ const AlertItem = ({
               {formatDistanceToNow(timestamp, { addSuffix: true })}
             </p>
           </div>
+          
+          {/* Details expansion section */}
+          {(affectedAreas.length > 0 || reliefMeasures.length > 0) && (
+            <div className="mt-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-0 h-auto text-xs text-muted-foreground flex items-center gap-1"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {isExpanded ? (
+                  <>
+                    <ChevronUp className="h-3 w-3" />
+                    <span>Hide details</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3 w-3" />
+                    <span>Show details</span>
+                  </>
+                )}
+              </Button>
+              
+              {isExpanded && (
+                <div className="mt-3 space-y-3 text-sm border-t pt-3 border-muted">
+                  {affectedAreas.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-xs uppercase text-muted-foreground mb-1">Affected Areas</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {affectedAreas.map((area, index) => (
+                          <Badge key={index} variant="outline" className="bg-background">
+                            {area}
+                          </Badge>
+                        ))}
+                      </div>
+                      {population && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Est. population affected: <span className="font-semibold">{population.toLocaleString()}</span>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  
+                  {reliefMeasures.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-xs uppercase text-muted-foreground mb-1">Relief Measures</h4>
+                      <ul className="list-disc pl-4 space-y-1 text-xs">
+                        {reliefMeasures.map((measure, index) => (
+                          <li key={index}>{measure}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
           
           <div className={cn(
             "flex items-center gap-2 mt-3 transition-opacity",

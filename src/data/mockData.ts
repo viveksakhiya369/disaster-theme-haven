@@ -9,6 +9,16 @@ export const alertsData = [
     timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
     severity: "critical",
     read: false,
+    affectedAreas: ["Riverside County", "South District", "Millbrook", "East Valley"],
+    population: 125000,
+    reliefMeasures: [
+      "3 emergency shelters established at local schools",
+      "Rescue boats deployed to heavily flooded areas",
+      "Emergency water pumps operating in South District",
+      "National Guard activated for rescue operations"
+    ],
+    lat: 34.0522,
+    lng: -118.2437,
   },
   {
     id: "alert-2",
@@ -17,6 +27,15 @@ export const alertsData = [
     timestamp: new Date(Date.now() - 1000 * 60 * 45), // 45 minutes ago
     severity: "high",
     read: false,
+    affectedAreas: ["Coastal Boulevard", "Marina District", "Harbor View", "Bay Shore"],
+    population: 75000,
+    reliefMeasures: [
+      "Evacuation centers open at Central High School and Community Center",
+      "Public transportation running extended hours for evacuation",
+      "Police conducting door-to-door notifications in vulnerable areas"
+    ],
+    lat: 25.7617,
+    lng: -80.1918,
   },
   {
     id: "alert-3",
@@ -25,6 +44,15 @@ export const alertsData = [
     timestamp: new Date(Date.now() - 1000 * 60 * 120), // 2 hours ago
     severity: "medium",
     read: true,
+    affectedAreas: ["Highway 101 Mile 25-40", "Cliffside Community", "Woodland Heights"],
+    population: 30000,
+    reliefMeasures: [
+      "Detour routes established through Routes 82 and 280",
+      "Heavy equipment deployed for debris clearing",
+      "Geological assessment team evaluating hillside stability"
+    ],
+    lat: 37.7749,
+    lng: -122.4194,
   },
   {
     id: "alert-4",
@@ -33,6 +61,15 @@ export const alertsData = [
     timestamp: new Date(Date.now() - 1000 * 60 * 180), // 3 hours ago
     severity: "low",
     read: true,
+    affectedAreas: ["Metro Area", "Northern Suburbs", "Downtown Core"],
+    population: 250000,
+    reliefMeasures: [
+      "Utility crews on standby for power outages",
+      "Storm drains being cleared to prevent localized flooding",
+      "Public information campaign active on local media"
+    ],
+    lat: 40.7128,
+    lng: -74.0060,
   },
 ];
 

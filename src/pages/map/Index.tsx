@@ -2,14 +2,16 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
-import { Search, Layers, Compass, Maximize, ZoomIn, ZoomOut, MapPin, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, Layers, Compass, Maximize, ZoomIn, ZoomOut, MapPin, AlertTriangle, Users, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { alertsData } from "@/data/mockData";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import DisasterMap from "@/components/map/DisasterMap";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatDistanceToNow } from "date-fns";
 
 // Define the alert location type
 interface AlertLocation {
@@ -20,6 +22,9 @@ interface AlertLocation {
   lat: number;
   lng: number;
   timestamp: Date;
+  affectedAreas?: string[];
+  population?: number;
+  reliefMeasures?: string[];
 }
 
 const MapViewPage = () => {
@@ -31,74 +36,8 @@ const MapViewPage = () => {
   // Simulate fetching alert data with coordinates
   useEffect(() => {
     // In a real application, this would be fetched from an API
-    // For demo purposes, adding coordinates to our existing alerts
-    const locations: AlertLocation[] = [
-      {
-        id: "alert-1",
-        title: "Flash Flood Warning",
-        description: "Flash flooding reported in southern districts. Emergency response teams deployed.",
-        severity: "critical",
-        lat: 34.0522,
-        lng: -118.2437,
-        timestamp: new Date(Date.now() - 1000 * 60 * 15),
-      },
-      {
-        id: "alert-2",
-        title: "Evacuation Notice",
-        description: "Voluntary evacuation order issued for coastal areas due to approaching storm.",
-        severity: "high",
-        lat: 25.7617,
-        lng: -80.1918,
-        timestamp: new Date(Date.now() - 1000 * 60 * 45),
-      },
-      {
-        id: "alert-3",
-        title: "Road Closure",
-        description: "Highway 101 closed due to landslide. Use alternate routes.",
-        severity: "medium",
-        lat: 37.7749,
-        lng: -122.4194,
-        timestamp: new Date(Date.now() - 1000 * 60 * 120),
-      },
-      {
-        id: "alert-4",
-        title: "Weather Advisory",
-        description: "Thunderstorms expected in the evening. Stay indoors if possible.",
-        severity: "low",
-        lat: 40.7128,
-        lng: -74.0060,
-        timestamp: new Date(Date.now() - 1000 * 60 * 180),
-      },
-      {
-        id: "alert-5",
-        title: "Earthquake",
-        description: "6.2 magnitude earthquake detected. Building inspections underway.",
-        severity: "critical",
-        lat: 35.6762,
-        lng: 139.6503,
-        timestamp: new Date(Date.now() - 1000 * 60 * 30),
-      },
-      {
-        id: "alert-6",
-        title: "Wildfire Alert",
-        description: "Wildfire spreading in northern forest. Evacuation may be necessary.",
-        severity: "high",
-        lat: 48.8566,
-        lng: 2.3522,
-        timestamp: new Date(Date.now() - 1000 * 60 * 60),
-      },
-      {
-        id: "alert-7",
-        title: "Tsunami Warning",
-        description: "Tsunami warning issued for coastal areas. Move to higher ground immediately.",
-        severity: "critical",
-        lat: -33.8688,
-        lng: 151.2093,
-        timestamp: new Date(Date.now() - 1000 * 60 * 10),
-      },
-    ];
-
-    setAlertLocations(locations);
+    // For demo purposes, we're using our expanded alertsData
+    setAlertLocations(alertsData);
     setIsLoading(false);
   }, []);
 
@@ -112,7 +51,15 @@ const MapViewPage = () => {
 
   const filteredAlerts = alertLocations.filter(alert => 
     alert.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    alert.description.toLowerCase().includes(searchQuery.toLowerCase())
+    alert.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (alert.affectedAreas?.some(area => 
+      area.toLowerCase().includes(searchQuery.toLowerCase())
+    ))
+  );
+
+  const totalAffectedPopulation = filteredAlerts.reduce(
+    (sum, alert) => sum + (alert.population || 0), 
+    0
   );
 
   return (
@@ -124,14 +71,23 @@ const MapViewPage = () => {
       
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
-          <div className="relative w-72">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search alerts..." 
-              className="pl-8"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
+          <div className="flex items-center gap-3">
+            <div className="relative w-72">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search alerts..." 
+                className="pl-8"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
+            
+            {totalAffectedPopulation > 0 && (
+              <Badge variant="outline" className="text-muted-foreground bg-background">
+                <Users className="h-3 w-3 mr-1" />
+                {totalAffectedPopulation.toLocaleString()} affected
+              </Badge>
+            )}
           </div>
           
           <div className="flex gap-2">
@@ -157,39 +113,105 @@ const MapViewPage = () => {
           />
           
           {selectedAlert && (
-            <div className="absolute left-4 top-4 w-72 z-10">
-              <Alert className={cn(
-                "shadow-lg border-l-4",
-                selectedAlert.severity === "critical" && "border-l-destructive",
-                selectedAlert.severity === "high" && "border-l-warning",
-                selectedAlert.severity === "medium" && "border-l-info",
-                selectedAlert.severity === "low" && "border-l-success"
-              )}>
-                <AlertTriangle className={cn(
-                  "h-4 w-4",
-                  selectedAlert.severity === "critical" && "text-destructive",
-                  selectedAlert.severity === "high" && "text-warning",
-                  selectedAlert.severity === "medium" && "text-info",
-                  selectedAlert.severity === "low" && "text-success"
-                )} />
-                <AlertTitle className="font-semibold">{selectedAlert.title}</AlertTitle>
-                <AlertDescription>
-                  {selectedAlert.description}
-                  <div className="mt-2 flex gap-2 items-center">
-                    <Badge className={cn(
-                      selectedAlert.severity === "critical" && "bg-destructive text-destructive-foreground",
-                      selectedAlert.severity === "high" && "bg-warning text-warning-foreground",
-                      selectedAlert.severity === "medium" && "bg-info text-info-foreground",
-                      selectedAlert.severity === "low" && "bg-success text-success-foreground"
-                    )}>
-                      {selectedAlert.severity}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {selectedAlert.timestamp.toLocaleString()}
-                    </span>
-                  </div>
-                </AlertDescription>
-              </Alert>
+            <div className="absolute left-4 top-4 w-80 z-10">
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="affected">Affected Areas</TabsTrigger>
+                  <TabsTrigger value="relief">Relief</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="overview" className="mt-0">
+                  <Alert className={cn(
+                    "shadow-lg border-l-4",
+                    selectedAlert.severity === "critical" && "border-l-destructive",
+                    selectedAlert.severity === "high" && "border-l-warning",
+                    selectedAlert.severity === "medium" && "border-l-info",
+                    selectedAlert.severity === "low" && "border-l-success"
+                  )}>
+                    <AlertTriangle className={cn(
+                      "h-4 w-4",
+                      selectedAlert.severity === "critical" && "text-destructive",
+                      selectedAlert.severity === "high" && "text-warning",
+                      selectedAlert.severity === "medium" && "text-info",
+                      selectedAlert.severity === "low" && "text-success"
+                    )} />
+                    <AlertTitle className="font-semibold">{selectedAlert.title}</AlertTitle>
+                    <AlertDescription>
+                      {selectedAlert.description}
+                      <div className="mt-2 flex gap-2 items-center">
+                        <Badge className={cn(
+                          selectedAlert.severity === "critical" && "bg-destructive text-destructive-foreground",
+                          selectedAlert.severity === "high" && "bg-warning text-warning-foreground",
+                          selectedAlert.severity === "medium" && "bg-info text-info-foreground",
+                          selectedAlert.severity === "low" && "bg-success text-success-foreground"
+                        )}>
+                          {selectedAlert.severity}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(selectedAlert.timestamp, { addSuffix: true })}
+                        </span>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                </TabsContent>
+                
+                <TabsContent value="affected" className="mt-0">
+                  <Alert className="shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <AlertTitle className="font-semibold">Affected Areas</AlertTitle>
+                    </div>
+                    <AlertDescription>
+                      {selectedAlert.population && (
+                        <div className="mt-2 mb-3">
+                          <Badge variant="outline" className="bg-background text-foreground">
+                            Est. <span className="font-semibold">{selectedAlert.population.toLocaleString()}</span> people affected
+                          </Badge>
+                        </div>
+                      )}
+                      
+                      {selectedAlert.affectedAreas && selectedAlert.affectedAreas.length > 0 ? (
+                        <div className="space-y-2">
+                          {selectedAlert.affectedAreas.map((area, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              <span>{area}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No specific areas reported</p>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                </TabsContent>
+                
+                <TabsContent value="relief" className="mt-0">
+                  <Alert className="shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      <AlertTitle className="font-semibold">Relief Measures</AlertTitle>
+                    </div>
+                    <AlertDescription>
+                      {selectedAlert.reliefMeasures && selectedAlert.reliefMeasures.length > 0 ? (
+                        <ul className="mt-2 space-y-2">
+                          {selectedAlert.reliefMeasures.map((measure, index) => (
+                            <li key={index} className="flex items-start gap-2">
+                              <div className="mt-1 min-w-4">
+                                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                              </div>
+                              <span className="text-sm">{measure}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No relief measures reported yet</p>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                </TabsContent>
+              </Tabs>
             </div>
           )}
         </div>
@@ -228,9 +250,12 @@ const MapViewPage = () => {
                     )}>
                       {alert.severity}
                     </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {alert.timestamp.toLocaleTimeString()}
-                    </span>
+                    {alert.population && (
+                      <Badge variant="outline" className="text-xs text-muted-foreground">
+                        <Users className="h-3 w-3 mr-1" />
+                        {alert.population.toLocaleString()}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>
