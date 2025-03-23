@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
@@ -134,9 +133,9 @@ const PlanningPage = () => {
     id: event.id,
     title: event.title,
     date: new Date(event.date),
-    type: event.type === "drill" ? "Drill" : 
-          event.type === "meeting" ? "Meeting" : 
-          event.type === "training" ? "Training" : "Other"
+    type: (event.type === "drill" ? "Drill" : 
+           event.type === "meeting" ? "Meeting" : 
+           event.type === "training" ? "Training" : "Other") as "Drill" | "Meeting" | "Training" | "Other"
   }));
   
   const handleCreateEvent = () => {

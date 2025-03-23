@@ -273,9 +273,9 @@ const AlertsPage = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Create Alert Dialog */}
+      {/* Create Alert Dialog with Scrollable Content */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>Create New Alert</DialogTitle>
             <DialogDescription>
@@ -283,7 +283,7 @@ const AlertsPage = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 overflow-y-auto pr-2">
             <div className="space-y-2">
               <Label htmlFor="alert-title">Alert Title</Label>
               <Input 
@@ -382,7 +382,7 @@ const AlertsPage = () => {
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="mt-2 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowCreateDialog(false)}>Cancel</Button>
             <Button onClick={handleCreateAlert}>Create Alert</Button>
           </DialogFooter>

@@ -50,7 +50,7 @@ const NavItem = ({ icon: Icon, label, to, active, hasAlert, onClick }: NavItemPr
         )}
         <div
           className={cn(
-            "absolute left-0 top-0 h-full w-0.5 bg-sidebar-primary scale-y-0 transition-transform origin-center duration-150 ease-out",
+            "absolute left-0 top-0 h-full w-0.5 bg-primary scale-y-0 transition-transform origin-center duration-150 ease-out",
             active && "scale-y-100"
           )}
         />
@@ -62,8 +62,7 @@ const NavItem = ({ icon: Icon, label, to, active, hasAlert, onClick }: NavItemPr
 const Sidebar = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const { theme } = useTheme();
-
+  
   // Define route paths and their corresponding labels
   const pathToLabel: Record<string, string> = {
     "/": "Dashboard",

@@ -1,18 +1,14 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system";
 type FontSize = "normal" | "large" | "larger";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
-  defaultTheme?: Theme;
   storageKey?: string;
 };
 
 type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
   accentColor: string;
   setAccentColor: (color: string) => void;
   fontSize: FontSize;
@@ -24,8 +20,6 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "system",
-  setTheme: () => null,
   accentColor: "blue",
   setAccentColor: () => null,
   fontSize: "normal",
@@ -40,14 +34,9 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
   storageKey = "ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
-  
   const [accentColor, setAccentColor] = useState<string>(
     () => localStorage.getItem("ui-accent") || "blue"
   );
@@ -63,24 +52,6 @@ export function ThemeProvider({
   const [highContrast, setHighContrast] = useState<boolean>(
     () => localStorage.getItem("ui-high-contrast") === "true"
   );
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    
-    root.classList.remove("light", "dark");
-    
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      
-      root.classList.add(systemTheme);
-      return;
-    }
-    
-    root.classList.add(theme);
-  }, [theme]);
   
   useEffect(() => {
     localStorage.setItem("ui-accent", accentColor);
@@ -135,11 +106,6 @@ export function ThemeProvider({
   }, [highContrast]);
 
   const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
     accentColor,
     setAccentColor: (color: string) => {
       setAccentColor(color);
