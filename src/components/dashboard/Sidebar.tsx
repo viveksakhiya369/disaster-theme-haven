@@ -118,7 +118,7 @@ const Sidebar = () => {
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
           <Link to="/" className="text-sidebar-foreground font-semibold text-xl">
-            Disaster<span className="text-sidebar-primary">Ctrl</span>
+            Disaster<span className="text-primary">Ctrl</span>
           </Link>
         )}
         <Button 
@@ -146,7 +146,7 @@ const Sidebar = () => {
       <div className="p-4 border-t border-sidebar-border">
         {!collapsed && (
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground font-medium">
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium">
               AD
             </div>
             <div>

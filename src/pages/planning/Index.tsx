@@ -1,703 +1,571 @@
 
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
-import { Button } from "@/components/ui/button";
-import { Plus, Search, Calendar, Clock, MapPin, Users, CheckCircle, Edit, Trash } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EventCalendar from "@/components/planning/EventCalendar";
-import { useState } from "react";
-import { 
+import { Button } from "@/components/ui/button";
+import {
+  Calendar,
+  Filter,
+  Plus,
+  MoreHorizontal,
+  Trash,
+  Edit,
+  Share,
+  FileText,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  HelpCircle,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Dialog,
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+
+// Mock event data
+const mockEvents = [
+  {
+    id: "1",
+    title: "Emergency Response Drill",
+    date: "2023-06-15",
+    time: "09:00",
+    duration: "2 hours",
+    status: "upcoming",
+    type: "drill",
+    location: "HQ Training Facility",
+    description: "Regular emergency response drill for all staff members",
+    assignees: ["John Doe", "Sarah Smith"],
+  },
+  {
+    id: "2",
+    title: "Quarterly Budget Review",
+    date: "2023-06-20",
+    time: "14:00",
+    duration: "1 hour",
+    status: "upcoming",
+    type: "meeting",
+    location: "Conference Room A",
+    description: "Review of quarterly budget allocation and resource planning",
+    assignees: ["Admin User", "Finance Team"],
+  },
+  {
+    id: "3",
+    title: "Staff Training: New Protocol",
+    date: "2023-06-10",
+    time: "10:00",
+    duration: "3 hours",
+    status: "completed",
+    type: "training",
+    location: "Training Center",
+    description: "Introduction to new emergency response protocol for all staff",
+    assignees: ["Training Team", "All Staff"],
+  },
+  {
+    id: "4",
+    title: "Resource Allocation Meeting",
+    date: "2023-06-05",
+    time: "11:00",
+    duration: "1.5 hours",
+    status: "completed",
+    type: "meeting",
+    location: "Virtual (Zoom)",
+    description: "Discussion about resource allocation for upcoming season",
+    assignees: ["Resource Team", "Admin User"],
+  },
+  {
+    id: "5",
+    title: "Emergency Simulation Exercise",
+    date: "2023-06-30",
+    time: "09:30",
+    duration: "4 hours",
+    status: "upcoming",
+    type: "drill",
+    location: "Field Location Alpha",
+    description: "Full-scale emergency simulation with all departments",
+    assignees: ["Operations Team", "All Departments"],
+  },
+];
 
 const PlanningPage = () => {
-  const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [createEventOpen, setCreateEventOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("upcoming");
-  
-  // Mock events for calendar
-  const calendarEvents = [
-    {
-      id: "evt-001",
-      title: "Emergency Response Training",
-      date: new Date("2023-06-15"),
-      type: "Training" as const
-    },
-    {
-      id: "evt-002",
-      title: "Flood Preparedness Drill",
-      date: new Date("2023-06-18"),
-      type: "Drill" as const
-    },
-    {
-      id: "evt-003",
-      title: "Quarterly Resource Planning",
-      date: new Date("2023-06-20"),
-      type: "Meeting" as const
-    }
-  ];
-  
-  const mockEvents = [
-    {
-      id: "EVT-001",
-      title: "Emergency Response Training",
-      type: "Training",
-      location: "Central Fire Station",
-      date: "2023-06-15",
-      startTime: "09:00",
-      endTime: "15:00",
-      participants: 24,
-      status: "Upcoming"
-    },
-    {
-      id: "EVT-002",
-      title: "Flood Preparedness Drill",
-      type: "Drill",
-      location: "Riverside District",
-      date: "2023-06-18",
-      startTime: "10:00",
-      endTime: "13:00",
-      participants: 32,
-      status: "Upcoming"
-    },
-    {
-      id: "EVT-003",
-      title: "Quarterly Resource Planning",
-      type: "Meeting",
-      location: "Operations Center",
-      date: "2023-06-20",
-      startTime: "14:00",
-      endTime: "16:00",
-      participants: 12,
-      status: "Upcoming"
-    },
-    {
-      id: "EVT-004",
-      title: "First Aid Certification",
-      type: "Training",
-      location: "Medical Center",
-      date: "2023-06-12",
-      startTime: "09:00",
-      endTime: "17:00",
-      participants: 18,
-      status: "Completed"
-    },
-    {
-      id: "EVT-005",
-      title: "Public Safety Coordination",
-      type: "Meeting",
-      location: "City Hall",
-      date: "2023-06-08",
-      startTime: "13:00",
-      endTime: "15:00",
-      participants: 15,
-      status: "Completed"
-    }
-  ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Upcoming": return "bg-blue-500";
-      case "In Progress": return "bg-orange-500";
-      case "Completed": return "bg-green-500";
-      case "Cancelled": return "bg-red-500";
-      default: return "bg-gray-500";
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "Training": return "bg-purple-100 text-purple-800";
-      case "Drill": return "bg-orange-100 text-orange-800";
-      case "Meeting": return "bg-blue-100 text-blue-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
+  const [events, setEvents] = useState(mockEvents);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    date: "",
+    time: "",
+    duration: "",
+    location: "",
+    type: "meeting",
+    description: "",
+    assignees: "",
+  });
   
   const handleCreateEvent = () => {
-    toast({
-      title: "Event Created",
-      description: "New event has been added to the calendar."
-    });
-    setCreateEventOpen(false);
-  };
-  
-  const handleEditEvent = (eventId: string) => {
-    toast({
-      title: "Event Updated",
-      description: `Event ${eventId} has been updated.`
-    });
-  };
-  
-  const handleDeleteEvent = (eventId: string) => {
-    toast({
-      title: "Event Deleted",
-      description: `Event ${eventId} has been deleted.`
-    });
-  };
-  
-  const filteredEvents = mockEvents.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const eventToAdd = {
+      id: Date.now().toString(),
+      ...newEvent,
+      status: "upcoming",
+      assignees: newEvent.assignees.split(',').map(a => a.trim()),
+    };
     
-    const matchesFilter = activeFilter === "all" || event.status.toLowerCase() === activeFilter.toLowerCase();
-    
-    return matchesSearch && matchesFilter;
+    setEvents([...events, eventToAdd]);
+    setNewEvent({
+      title: "",
+      date: "",
+      time: "",
+      duration: "",
+      location: "",
+      type: "meeting",
+      description: "",
+      assignees: "",
+    });
+    setShowCreateDialog(false);
+    toast.success("Event created successfully");
+  };
+  
+  const handleDeleteEvent = (id: string) => {
+    setEvents(events.filter(event => event.id !== id));
+    toast.success("Event deleted successfully");
+  };
+  
+  const filteredEvents = events.filter(event => {
+    const matchesStatus = statusFilter === "all" || event.status === statusFilter;
+    const matchesType = typeFilter === "all" || event.type === typeFilter;
+    return matchesStatus && matchesType;
   });
-
+  
+  const groupedEvents = {
+    upcoming: filteredEvents.filter(event => event.status === "upcoming"),
+    completed: filteredEvents.filter(event => event.status === "completed"),
+  };
+  
   return (
     <DashboardLayout>
       <Header 
-        title="Planning" 
-        subtitle="Schedule and manage drills, training and events"
+        title="Planning & Scheduling" 
+        subtitle="Manage events, drills, and meetings"
       />
+      
+      <div className="mb-6 flex flex-col md:flex-row gap-4 justify-between">
+        <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            <Select 
+              value={statusFilter} 
+              onValueChange={setStatusFilter}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Status</SelectLabel>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="upcoming">Upcoming</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Select 
+              value={typeFilter} 
+              onValueChange={setTypeFilter}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Event Type</SelectLabel>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="meeting">Meeting</SelectItem>
+                  <SelectItem value="drill">Drill</SelectItem>
+                  <SelectItem value="training">Training</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
+        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <DialogTrigger asChild>
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create Event
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Create New Event</DialogTitle>
+              <DialogDescription>
+                Add details for the new event, drill, or meeting
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="event-title">Event Title</Label>
+                  <Input 
+                    id="event-title" 
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                    placeholder="Enter event title"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="event-type">Event Type</Label>
+                  <Select 
+                    value={newEvent.type} 
+                    onValueChange={(value) => setNewEvent({...newEvent, type: value})}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select event type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="meeting">Meeting</SelectItem>
+                      <SelectItem value="drill">Drill</SelectItem>
+                      <SelectItem value="training">Training</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="event-date">Date</Label>
+                  <Input 
+                    id="event-date" 
+                    type="date" 
+                    value={newEvent.date}
+                    onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="event-time">Time</Label>
+                  <Input 
+                    id="event-time" 
+                    type="time" 
+                    value={newEvent.time}
+                    onChange={(e) => setNewEvent({...newEvent, time: e.target.value})}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="event-duration">Duration</Label>
+                  <Input 
+                    id="event-duration" 
+                    placeholder="e.g. 2 hours" 
+                    value={newEvent.duration}
+                    onChange={(e) => setNewEvent({...newEvent, duration: e.target.value})}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="event-location">Location</Label>
+                  <Input 
+                    id="event-location" 
+                    placeholder="Enter location" 
+                    value={newEvent.location}
+                    onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="event-assignees">Assignees</Label>
+                <Input 
+                  id="event-assignees" 
+                  placeholder="Enter names, separated by commas" 
+                  value={newEvent.assignees}
+                  onChange={(e) => setNewEvent({...newEvent, assignees: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="event-description">Description</Label>
+                <Textarea 
+                  id="event-description" 
+                  placeholder="Enter event details" 
+                  rows={3}
+                  value={newEvent.description}
+                  onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCreateDialog(false)}>Cancel</Button>
+              <Button onClick={handleCreateEvent}>Create Event</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
-          <EventCalendar events={calendarEvents} />
+          <EventCalendar />
         </div>
-        
-        <div className="glass p-4 rounded-xl">
-          <h3 className="text-lg font-medium mb-3">Today's Schedule</h3>
-          <div className="space-y-3">
-            <div className="flex gap-3 items-start border-b pb-3">
-              <div className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 text-blue-800">
-                <Clock className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-medium">Staff Briefing</p>
-                <p className="text-sm text-muted-foreground">08:30 - 09:00</p>
-                <p className="text-xs text-muted-foreground">Operations Center</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start border-b pb-3">
-              <div className="flex items-center justify-center h-10 w-10 rounded-full bg-green-100 text-green-800">
-                <Users className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-medium">Team Alpha Deployment</p>
-                <p className="text-sm text-muted-foreground">09:30 - 12:00</p>
-                <p className="text-xs text-muted-foreground">Downtown Area</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <div className="flex items-center justify-center h-10 w-10 rounded-full bg-purple-100 text-purple-800">
-                <MapPin className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-medium">Resource Distribution</p>
-                <p className="text-sm text-muted-foreground">14:00 - 16:00</p>
-                <p className="text-xs text-muted-foreground">Central Warehouse</p>
-              </div>
+        <div>
+          <div className="p-6 rounded-xl glass space-y-4">
+            <h3 className="text-lg font-medium mb-2">Upcoming Events</h3>
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+              {groupedEvents.upcoming.length > 0 ? (
+                groupedEvents.upcoming.map((event) => (
+                  <div key={event.id} className="p-3 rounded-lg border bg-card">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-medium">{event.title}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {event.date} at {event.time} ({event.duration})
+                        </p>
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>{event.title}</DialogTitle>
+                            <DialogDescription>
+                              Event details and actions
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="py-4">
+                            <div className="space-y-4">
+                              <div>
+                                <h4 className="text-sm font-semibold">Date & Time</h4>
+                                <p className="text-sm">{event.date} at {event.time} ({event.duration})</p>
+                              </div>
+                              
+                              <div>
+                                <h4 className="text-sm font-semibold">Location</h4>
+                                <p className="text-sm">{event.location}</p>
+                              </div>
+                              
+                              <div>
+                                <h4 className="text-sm font-semibold">Description</h4>
+                                <p className="text-sm">{event.description}</p>
+                              </div>
+                              
+                              <div>
+                                <h4 className="text-sm font-semibold">Assignees</h4>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {event.assignees.map((assignee, index) => (
+                                    <Badge key={index} variant="outline">{assignee}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <DialogFooter className="flex justify-between items-center">
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="gap-1" 
+                                onClick={() => handleDeleteEvent(event.id)}
+                              >
+                                <Trash className="h-3.5 w-3.5" />
+                                Delete
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="gap-1"
+                              >
+                                <Edit className="h-3.5 w-3.5" />
+                                Edit
+                              </Button>
+                            </div>
+                            <Button>Close</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      <Badge variant={event.type === 'drill' ? 'destructive' : event.type === 'training' ? 'default' : 'secondary'}>
+                        {event.type}
+                      </Badge>
+                      <Badge variant="outline">{event.location}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{event.description}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-muted-foreground py-4">No upcoming events</p>
+              )}
             </div>
           </div>
         </div>
       </div>
       
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Event Management</h2>
-          <Button className="gap-2" onClick={() => setCreateEventOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Create Event
-          </Button>
-        </div>
-        
-        <Tabs defaultValue="upcoming" className="w-full">
-          <TabsList>
-            <TabsTrigger 
-              value="upcoming" 
-              onClick={() => setActiveFilter("upcoming")}
-            >
-              Upcoming
-            </TabsTrigger>
-            <TabsTrigger 
-              value="completed" 
-              onClick={() => setActiveFilter("completed")}
-            >
-              Completed
-            </TabsTrigger>
-            <TabsTrigger 
-              value="all" 
-              onClick={() => setActiveFilter("all")}
-            >
-              All Events
-            </TabsTrigger>
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="w-full mb-4 grid grid-cols-2">
+            <TabsTrigger value="list">List View</TabsTrigger>
+            <TabsTrigger value="completed">Completed Events</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="upcoming" className="mt-4">
-            <div className="p-6 rounded-xl glass transition-all duration-300 ease-in-out">
-              <div className="flex justify-between mb-4">
-                <div className="relative w-64">
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Search events..." 
-                    className="pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">Filter</Button>
-                  <Button variant="outline" size="sm">Export</Button>
-                </div>
-              </div>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b text-left">
-                      <th className="pb-2 font-medium">Event</th>
-                      <th className="pb-2 font-medium">Type</th>
-                      <th className="pb-2 font-medium">Date & Time</th>
-                      <th className="pb-2 font-medium">Location</th>
-                      <th className="pb-2 font-medium">Participants</th>
-                      <th className="pb-2 font-medium">Status</th>
-                      <th className="pb-2 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredEvents.filter(event => event.status === "Upcoming").map((event) => (
-                      <tr key={event.id} className="border-b hover:bg-accent/10">
-                        <td className="py-3">
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {event.id}
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <span className={`${getTypeColor(event.type)} text-xs font-medium py-1 px-2 rounded-full`}>
-                            {event.type}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <div>{event.date}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {event.startTime} - {event.endTime}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
+          <TabsContent value="list">
+            <div className="p-6 rounded-xl glass">
+              <div className="divide-y">
+                {groupedEvents.upcoming.length > 0 ? (
+                  groupedEvents.upcoming.map((event) => (
+                    <div key={event.id} className="py-4 flex items-center justify-between">
+                      <div className="flex items-start gap-4">
+                        <div className={`p-2 rounded-lg ${
+                          event.type === 'drill' ? 'bg-destructive/10 text-destructive' : 
+                          event.type === 'training' ? 'bg-primary/10 text-primary' : 
+                          'bg-secondary/80 text-secondary-foreground'
+                        }`}>
+                          {event.type === 'drill' ? <AlertCircle className="h-5 w-5" /> : 
+                           event.type === 'training' ? <HelpCircle className="h-5 w-5" /> : 
+                           <Calendar className="h-5 w-5" />}
+                        </div>
+                        <div>
+                          <h4 className="font-medium">{event.title}</h4>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span>{event.date} at {event.time}</span>
+                            <span>•</span>
                             <span>{event.location}</span>
                           </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            <span>{event.participants}</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {event.assignees.slice(0, 2).map((assignee, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">{assignee}</Badge>
+                            ))}
+                            {event.assignees.length > 2 && (
+                              <Badge variant="outline" className="text-xs">+{event.assignees.length - 2} more</Badge>
+                            )}
                           </div>
-                        </td>
-                        <td className="py-3">
-                          <span className={`${getStatusColor(event.status)} text-white text-xs font-medium py-1 px-2 rounded-full`}>
-                            {event.status}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Edit Event</DialogTitle>
-                                  <DialogDescription>
-                                    Update the details for {event.title}
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="eventTitle">Event Title</Label>
-                                    <Input id="eventTitle" defaultValue={event.title} />
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div className="grid gap-2">
-                                      <Label htmlFor="eventDate">Date</Label>
-                                      <Input id="eventDate" type="date" defaultValue={event.date} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                      <Label htmlFor="eventType">Type</Label>
-                                      <Select defaultValue={event.type}>
-                                        <SelectTrigger>
-                                          <SelectValue placeholder="Select type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="Training">Training</SelectItem>
-                                          <SelectItem value="Drill">Drill</SelectItem>
-                                          <SelectItem value="Meeting">Meeting</SelectItem>
-                                          <SelectItem value="Other">Other</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div className="grid gap-2">
-                                      <Label htmlFor="startTime">Start Time</Label>
-                                      <Input id="startTime" type="time" defaultValue={event.startTime} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                      <Label htmlFor="endTime">End Time</Label>
-                                      <Input id="endTime" type="time" defaultValue={event.endTime} />
-                                    </div>
-                                  </div>
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="location">Location</Label>
-                                    <Input id="location" defaultValue={event.location} />
-                                  </div>
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="participants">Participants</Label>
-                                    <Input id="participants" type="number" defaultValue={event.participants.toString()} />
-                                  </div>
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea id="description" placeholder="Event details..." />
-                                  </div>
-                                </div>
-                                <DialogFooter>
-                                  <Button variant="outline">Cancel</Button>
-                                  <Button onClick={() => handleEditEvent(event.id)}>Save Changes</Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                            
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive">
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Delete Event</DialogTitle>
-                                  <DialogDescription>
-                                    Are you sure you want to delete this event? This action cannot be undone.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button variant="outline">Cancel</Button>
-                                  <Button variant="destructive" onClick={() => handleDeleteEvent(event.id)}>Delete Event</Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-48" align="end">
+                            <div className="space-y-1">
+                              <Button variant="ghost" className="w-full justify-start gap-2 h-8">
+                                <Edit className="h-4 w-4" />
+                                <span>Edit</span>
+                              </Button>
+                              <Button variant="ghost" className="w-full justify-start gap-2 h-8">
+                                <CheckCircle className="h-4 w-4" />
+                                <span>Mark Complete</span>
+                              </Button>
+                              <Button variant="ghost" className="w-full justify-start gap-2 h-8">
+                                <Share className="h-4 w-4" />
+                                <span>Share</span>
+                              </Button>
+                              <Button variant="ghost" className="w-full justify-start gap-2 h-8">
+                                <FileText className="h-4 w-4" />
+                                <span>Export</span>
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                className="w-full justify-start gap-2 h-8 text-destructive hover:text-destructive" 
+                                onClick={() => handleDeleteEvent(event.id)}
+                              >
+                                <Trash className="h-4 w-4" />
+                                <span>Delete</span>
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-muted-foreground py-4">No upcoming events</p>
+                )}
               </div>
             </div>
           </TabsContent>
           
-          <TabsContent value="completed" className="mt-4">
+          <TabsContent value="completed">
             <div className="p-6 rounded-xl glass">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b text-left">
-                      <th className="pb-2 font-medium">Event</th>
-                      <th className="pb-2 font-medium">Type</th>
-                      <th className="pb-2 font-medium">Date & Time</th>
-                      <th className="pb-2 font-medium">Location</th>
-                      <th className="pb-2 font-medium">Participants</th>
-                      <th className="pb-2 font-medium">Status</th>
-                      <th className="pb-2 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredEvents.filter(event => event.status === "Completed").map((event) => (
-                      <tr key={event.id} className="border-b hover:bg-accent/10">
-                        <td className="py-3">
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {event.id}
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <span className={`${getTypeColor(event.type)} text-xs font-medium py-1 px-2 rounded-full`}>
-                            {event.type}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <div>{event.date}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {event.startTime} - {event.endTime}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
+              <div className="divide-y">
+                {groupedEvents.completed.length > 0 ? (
+                  groupedEvents.completed.map((event) => (
+                    <div key={event.id} className="py-4 flex items-center justify-between opacity-75">
+                      <div className="flex items-start gap-4">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <CheckCircle className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">{event.title}</h4>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span>{event.date} at {event.time}</span>
+                            <span>•</span>
                             <span>{event.location}</span>
                           </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            <span>{event.participants}</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {event.assignees.slice(0, 2).map((assignee, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">{assignee}</Badge>
+                            ))}
+                            {event.assignees.length > 2 && (
+                              <Badge variant="outline" className="text-xs">+{event.assignees.length - 2} more</Badge>
+                            )}
                           </div>
-                        </td>
-                        <td className="py-3">
-                          <span className={`${getStatusColor(event.status)} text-white text-xs font-medium py-1 px-2 rounded-full`}>
-                            {event.status}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="h-8">
-                              Report
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="all" className="mt-4">
-            <div className="p-6 rounded-xl glass">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b text-left">
-                      <th className="pb-2 font-medium">Event</th>
-                      <th className="pb-2 font-medium">Type</th>
-                      <th className="pb-2 font-medium">Date & Time</th>
-                      <th className="pb-2 font-medium">Location</th>
-                      <th className="pb-2 font-medium">Status</th>
-                      <th className="pb-2 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredEvents.map((event) => (
-                      <tr key={event.id} className="border-b hover:bg-accent/10">
-                        <td className="py-3">
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {event.id}
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <span className={`${getTypeColor(event.type)} text-xs font-medium py-1 px-2 rounded-full`}>
-                            {event.type}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <div>{event.date}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {event.startTime} - {event.endTime}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span>{event.location}</span>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <span className={`${getStatusColor(event.status)} text-white text-xs font-medium py-1 px-2 rounded-full`}>
-                            {event.status}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleDeleteEvent(event.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-muted-foreground py-4">No completed events</p>
+                )}
               </div>
             </div>
           </TabsContent>
         </Tabs>
-      </div>
-      
-      {/* Create Event Dialog */}
-      <Dialog open={createEventOpen} onOpenChange={setCreateEventOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Create New Event</DialogTitle>
-            <DialogDescription>
-              Add a new event to your planning calendar
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="new-event-title">Event Title</Label>
-              <Input id="new-event-title" placeholder="Enter event title" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="new-event-date">Date</Label>
-                <Input id="new-event-date" type="date" />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="new-event-type">Type</Label>
-                <Select defaultValue="training">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="training">Training</SelectItem>
-                    <SelectItem value="drill">Drill</SelectItem>
-                    <SelectItem value="meeting">Meeting</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="new-start-time">Start Time</Label>
-                <Input id="new-start-time" type="time" />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="new-end-time">End Time</Label>
-                <Input id="new-end-time" type="time" />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="new-location">Location</Label>
-              <Input id="new-location" placeholder="Event location" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="new-participants">Expected Participants</Label>
-              <Input id="new-participants" type="number" placeholder="Number of participants" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="new-description">Description</Label>
-              <Textarea id="new-description" placeholder="Event details and objectives..." />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateEventOpen(false)}>Cancel</Button>
-            <Button onClick={handleCreateEvent}>Create Event</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-4 rounded-xl glass">
-          <h3 className="text-lg font-medium mb-3">Planning Checklist</h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <div className="flex-1">
-                <p className="font-medium">Update resource inventory</p>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Completed</span>
-                  <span>June 5</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <div className="flex-1">
-                <p className="font-medium">Review emergency protocols</p>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Completed</span>
-                  <span>June 8</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-5 w-5 rounded-full border-2 border-primary mt-0.5"></div>
-              <div className="flex-1">
-                <p className="font-medium">Staff training certification renewal</p>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>In Progress</span>
-                  <span>Due June 20</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-5 w-5 rounded-full border-2 border-primary mt-0.5"></div>
-              <div className="flex-1">
-                <p className="font-medium">Equipment maintenance schedule</p>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Pending</span>
-                  <span>Due June 25</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-5 w-5 rounded-full border-2 border-primary mt-0.5"></div>
-              <div className="flex-1">
-                <p className="font-medium">Update emergency contact list</p>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Pending</span>
-                  <span>Due June 30</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-span-2 p-4 rounded-xl glass">
-          <h3 className="text-lg font-medium mb-3">Upcoming Drills</h3>
-          <div className="space-y-3">
-            <div className="border-b pb-3">
-              <div className="flex justify-between">
-                <div className="font-medium">Flood Response Drill</div>
-                <div className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full">June 18</div>
-              </div>
-              <p className="text-sm text-muted-foreground">Riverside District</p>
-              <p className="text-xs text-muted-foreground mt-1">32 participants</p>
-            </div>
-            <div className="border-b pb-3">
-              <div className="flex justify-between">
-                <div className="font-medium">Building Evacuation Drill</div>
-                <div className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full">June 25</div>
-              </div>
-              <p className="text-sm text-muted-foreground">City Hall Complex</p>
-              <p className="text-xs text-muted-foreground mt-1">45 participants</p>
-            </div>
-            <div>
-              <div className="flex justify-between">
-                <div className="font-medium">Mass Casualty Exercise</div>
-                <div className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full">July 5</div>
-              </div>
-              <p className="text-sm text-muted-foreground">Convention Center</p>
-              <p className="text-xs text-muted-foreground mt-1">60+ participants</p>
-            </div>
-          </div>
-        </div>
       </div>
     </DashboardLayout>
   );
