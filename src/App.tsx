@@ -15,9 +15,6 @@ import ReportsPage from "./pages/reports/Index";
 import PlanningPage from "./pages/planning/Index";
 import ContactsPage from "./pages/contacts/Index";
 import SettingsPage from "./pages/settings/Index";
-import LoginPage from "./pages/auth/Login";
-import RegisterPage from "./pages/auth/Register";
-import ForgotPasswordPage from "./pages/auth/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -38,12 +35,6 @@ const App = () => (
           <Route path="/planning" element={<PlanningPage />} />
           <Route path="/contacts" element={<ContactsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          
-          {/* Auth routes */}
-          <Route path="/auth/login" element={<LoginPage />} />
-          <Route path="/auth/register" element={<RegisterPage />} />
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

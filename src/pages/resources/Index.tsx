@@ -1,4 +1,3 @@
-import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
@@ -8,18 +7,9 @@ import { resourceData } from "@/data/mockData";
 import StatisticsCard from "@/components/dashboard/StatisticsCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import ResourceForm from "@/components/resources/ResourceForm";
-import ResourceAllocation from "@/components/resources/ResourceAllocation";
-import { toast } from "sonner";
 
 const ResourcesPage = () => {
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [allocationModalOpen, setAllocationModalOpen] = useState(false);
-  const [selectedResource, setSelectedResource] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("vehicles");
-  
-  const [resources, setResources] = useState([
+  const mockResources = [
     {
       id: "RES-001",
       name: "Fire Trucks",
@@ -85,79 +75,8 @@ const ResourcesPage = () => {
       deployed: 25,
       lastChecked: "2023-06-10T11:30:00Z",
       location: "Central Warehouse"
-    },
-    {
-      id: "RES-007",
-      name: "Emergency Food Supplies",
-      type: "Supplies",
-      total: 500,
-      available: 450,
-      maintenance: 0,
-      deployed: 50,
-      lastChecked: "2023-06-12T08:30:00Z",
-      location: "Main Supply Depot"
-    },
-    {
-      id: "RES-008",
-      name: "Temporary Shelters",
-      type: "Facilities",
-      total: 20,
-      available: 18,
-      maintenance: 0,
-      deployed: 2,
-      lastChecked: "2023-06-09T10:45:00Z",
-      location: "Storage Facility"
     }
-  ]);
-
-  const handleAddResource = (values: any) => {
-    const newResource = {
-      id: `RES-${String(resources.length + 1).padStart(3, '0')}`,
-      name: values.name,
-      type: values.type,
-      total: parseInt(values.total),
-      available: parseInt(values.available),
-      maintenance: parseInt(values.maintenance),
-      deployed: parseInt(values.deployed),
-      lastChecked: new Date().toISOString(),
-      location: values.location
-    };
-    
-    setResources([...resources, newResource]);
-  };
-
-  const handleAllocate = (resource: any) => {
-    setSelectedResource(resource);
-    setAllocationModalOpen(true);
-  };
-
-  const handleCheck = (resource: any) => {
-    const updatedResources = resources.map(res => 
-      res.id === resource.id 
-        ? { ...res, lastChecked: new Date().toISOString() }
-        : res
-    );
-    
-    setResources(updatedResources);
-    toast.success(`${resource.name} checked and updated`);
-  };
-
-  const filteredResources = resources.filter(resource => {
-    const matchesTab = 
-      activeTab === "all" || 
-      (activeTab === "vehicles" && resource.type === "Vehicle") ||
-      (activeTab === "equipment" && resource.type === "Equipment") ||
-      (activeTab === "supplies" && resource.type === "Supplies") ||
-      (activeTab === "facilities" && resource.type === "Facilities") ||
-      (activeTab === "aircraft" && resource.type === "Aircraft");
-    
-    const matchesSearch = 
-      resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.id.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    return matchesTab && matchesSearch;
-  });
+  ];
 
   return (
     <DashboardLayout>
@@ -176,12 +95,7 @@ const ResourcesPage = () => {
       </div>
       
       <div className="mb-6">
-        <Tabs 
-          defaultValue="vehicles" 
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
+        <Tabs defaultValue="vehicles" className="w-full">
           <div className="flex justify-between items-center mb-4">
             <TabsList>
               <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
@@ -190,7 +104,7 @@ const ResourcesPage = () => {
               <TabsTrigger value="facilities">Facilities</TabsTrigger>
               <TabsTrigger value="aircraft">Aircraft</TabsTrigger>
             </TabsList>
-            <Button className="gap-2" onClick={() => setCreateModalOpen(true)}>
+            <Button className="gap-2">
               <Plus className="h-4 w-4" />
               Add Resource
             </Button>
@@ -204,8 +118,6 @@ const ResourcesPage = () => {
                   <Input 
                     placeholder="Search resources..." 
                     className="pl-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <div className="flex gap-2">
@@ -228,7 +140,7 @@ const ResourcesPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredResources.map((resource) => (
+                    {mockResources.filter(res => res.type === "Vehicle").map((resource) => (
                       <tr key={resource.id} className="border-b hover:bg-accent/10">
                         <td className="py-3 text-sm font-mono">{resource.id}</td>
                         <td className="py-3">
@@ -266,22 +178,11 @@ const ResourcesPage = () => {
                         </td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-8"
-                              onClick={() => handleAllocate(resource)}
-                              disabled={resource.available <= 0}
-                            >
+                            <Button variant="outline" size="sm" className="h-8">
                               <Clipboard className="h-3.5 w-3.5 mr-1" />
                               Allocate
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8"
-                              onClick={() => handleCheck(resource)}
-                            >
+                            <Button variant="ghost" size="sm" className="h-8">
                               <Check className="h-3.5 w-3.5 mr-1" />
                               Check
                             </Button>
@@ -291,361 +192,29 @@ const ResourcesPage = () => {
                     ))}
                   </tbody>
                 </table>
-                
-                {filteredResources.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No resources found matching your criteria
-                  </div>
-                )}
               </div>
             </div>
           </TabsContent>
           
+          {/* Other tabs would follow the same pattern */}
           <TabsContent value="equipment" className="mt-0">
             <div className="p-6 rounded-xl glass">
-              {filteredResources.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <div className="flex justify-between mb-4">
-                    <div className="relative w-64">
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        placeholder="Search equipment..." 
-                        className="pl-8"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b text-left">
-                        <th className="pb-2 font-medium">ID</th>
-                        <th className="pb-2 font-medium">Name</th>
-                        <th className="pb-2 font-medium">Status</th>
-                        <th className="pb-2 font-medium">Location</th>
-                        <th className="pb-2 font-medium">Last Checked</th>
-                        <th className="pb-2 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredResources.map((resource) => (
-                        <tr key={resource.id} className="border-b hover:bg-accent/10">
-                          <td className="py-3 text-sm font-mono">{resource.id}</td>
-                          <td className="py-3">
-                            <div className="font-medium">{resource.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              Total: {resource.total} units
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-xs mb-1">
-                                <span>Available: {resource.available}</span>
-                                <span>{Math.round((resource.available / resource.total) * 100)}%</span>
-                              </div>
-                              <Progress value={(resource.available / resource.total) * 100} className="h-2" />
-                            </div>
-                          </td>
-                          <td className="py-3">{resource.location}</td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-muted-foreground" />
-                              <span>{new Date(resource.lastChecked).toLocaleDateString()}</span>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleAllocate(resource)}
-                                disabled={resource.available <= 0}
-                              >
-                                <Clipboard className="h-3.5 w-3.5 mr-1" />
-                                Allocate
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleCheck(resource)}
-                              >
-                                <Check className="h-3.5 w-3.5 mr-1" />
-                                Check
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No Equipment resources found</p>
-              )}
+              <p className="text-center text-muted-foreground">Showing Equipment resources</p>
             </div>
           </TabsContent>
-          
           <TabsContent value="supplies" className="mt-0">
             <div className="p-6 rounded-xl glass">
-              {filteredResources.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <div className="flex justify-between mb-4">
-                    <div className="relative w-64">
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        placeholder="Search supplies..." 
-                        className="pl-8"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b text-left">
-                        <th className="pb-2 font-medium">ID</th>
-                        <th className="pb-2 font-medium">Name</th>
-                        <th className="pb-2 font-medium">Status</th>
-                        <th className="pb-2 font-medium">Location</th>
-                        <th className="pb-2 font-medium">Last Checked</th>
-                        <th className="pb-2 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredResources.map((resource) => (
-                        <tr key={resource.id} className="border-b hover:bg-accent/10">
-                          <td className="py-3 text-sm font-mono">{resource.id}</td>
-                          <td className="py-3">
-                            <div className="font-medium">{resource.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              Total: {resource.total} units
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-xs mb-1">
-                                <span>Available: {resource.available}</span>
-                                <span>{Math.round((resource.available / resource.total) * 100)}%</span>
-                              </div>
-                              <Progress value={(resource.available / resource.total) * 100} className="h-2" />
-                            </div>
-                          </td>
-                          <td className="py-3">{resource.location}</td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-muted-foreground" />
-                              <span>{new Date(resource.lastChecked).toLocaleDateString()}</span>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleAllocate(resource)}
-                                disabled={resource.available <= 0}
-                              >
-                                <Clipboard className="h-3.5 w-3.5 mr-1" />
-                                Allocate
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleCheck(resource)}
-                              >
-                                <Check className="h-3.5 w-3.5 mr-1" />
-                                Check
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No Supplies resources found</p>
-              )}
+              <p className="text-center text-muted-foreground">Showing Supplies resources</p>
             </div>
           </TabsContent>
-          
           <TabsContent value="facilities" className="mt-0">
             <div className="p-6 rounded-xl glass">
-              {filteredResources.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <div className="flex justify-between mb-4">
-                    <div className="relative w-64">
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        placeholder="Search facilities..." 
-                        className="pl-8"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b text-left">
-                        <th className="pb-2 font-medium">ID</th>
-                        <th className="pb-2 font-medium">Name</th>
-                        <th className="pb-2 font-medium">Status</th>
-                        <th className="pb-2 font-medium">Location</th>
-                        <th className="pb-2 font-medium">Last Checked</th>
-                        <th className="pb-2 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredResources.map((resource) => (
-                        <tr key={resource.id} className="border-b hover:bg-accent/10">
-                          <td className="py-3 text-sm font-mono">{resource.id}</td>
-                          <td className="py-3">
-                            <div className="font-medium">{resource.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              Total: {resource.total} units
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-xs mb-1">
-                                <span>Available: {resource.available}</span>
-                                <span>{Math.round((resource.available / resource.total) * 100)}%</span>
-                              </div>
-                              <Progress value={(resource.available / resource.total) * 100} className="h-2" />
-                            </div>
-                          </td>
-                          <td className="py-3">{resource.location}</td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-muted-foreground" />
-                              <span>{new Date(resource.lastChecked).toLocaleDateString()}</span>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleAllocate(resource)}
-                                disabled={resource.available <= 0}
-                              >
-                                <Clipboard className="h-3.5 w-3.5 mr-1" />
-                                Allocate
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleCheck(resource)}
-                              >
-                                <Check className="h-3.5 w-3.5 mr-1" />
-                                Check
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No Facilities resources found</p>
-              )}
+              <p className="text-center text-muted-foreground">Showing Facilities resources</p>
             </div>
           </TabsContent>
-          
           <TabsContent value="aircraft" className="mt-0">
             <div className="p-6 rounded-xl glass">
-              {filteredResources.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <div className="flex justify-between mb-4">
-                    <div className="relative w-64">
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        placeholder="Search aircraft..." 
-                        className="pl-8"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b text-left">
-                        <th className="pb-2 font-medium">ID</th>
-                        <th className="pb-2 font-medium">Name</th>
-                        <th className="pb-2 font-medium">Status</th>
-                        <th className="pb-2 font-medium">Location</th>
-                        <th className="pb-2 font-medium">Last Checked</th>
-                        <th className="pb-2 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredResources.map((resource) => (
-                        <tr key={resource.id} className="border-b hover:bg-accent/10">
-                          <td className="py-3 text-sm font-mono">{resource.id}</td>
-                          <td className="py-3">
-                            <div className="font-medium">{resource.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              Total: {resource.total} units
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-xs mb-1">
-                                <span>Available: {resource.available}</span>
-                                <span>{Math.round((resource.available / resource.total) * 100)}%</span>
-                              </div>
-                              <Progress value={(resource.available / resource.total) * 100} className="h-2" />
-                            </div>
-                          </td>
-                          <td className="py-3">{resource.location}</td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-muted-foreground" />
-                              <span>{new Date(resource.lastChecked).toLocaleDateString()}</span>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleAllocate(resource)}
-                                disabled={resource.available <= 0}
-                              >
-                                <Clipboard className="h-3.5 w-3.5 mr-1" />
-                                Allocate
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-8"
-                                onClick={() => handleCheck(resource)}
-                              >
-                                <Check className="h-3.5 w-3.5 mr-1" />
-                                Check
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No Aircraft resources found</p>
-              )}
+              <p className="text-center text-muted-foreground">Showing Aircraft resources</p>
             </div>
           </TabsContent>
         </Tabs>
@@ -739,18 +308,6 @@ const ResourcesPage = () => {
           </div>
         </div>
       </div>
-      
-      <ResourceForm 
-        open={createModalOpen} 
-        onOpenChange={setCreateModalOpen} 
-        onSubmit={handleAddResource} 
-      />
-      
-      <ResourceAllocation 
-        resource={selectedResource} 
-        open={allocationModalOpen} 
-        onOpenChange={setAllocationModalOpen} 
-      />
     </DashboardLayout>
   );
 };
