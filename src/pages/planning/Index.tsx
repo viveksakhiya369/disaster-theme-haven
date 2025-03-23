@@ -47,6 +47,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 // Mock event data
 const mockEvents = [
@@ -127,6 +128,16 @@ const PlanningPage = () => {
     description: "",
     assignees: "",
   });
+  
+  // Convert mockEvents to CalendarEvent format for EventCalendar component
+  const calendarEvents = events.map(event => ({
+    id: event.id,
+    title: event.title,
+    date: new Date(event.date),
+    type: event.type === "drill" ? "Drill" : 
+          event.type === "meeting" ? "Meeting" : 
+          event.type === "training" ? "Training" : "Other"
+  }));
   
   const handleCreateEvent = () => {
     const eventToAdd = {
@@ -337,7 +348,7 @@ const PlanningPage = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
-          <EventCalendar />
+          <EventCalendar events={calendarEvents} />
         </div>
         <div>
           <div className="p-6 rounded-xl glass space-y-4">
