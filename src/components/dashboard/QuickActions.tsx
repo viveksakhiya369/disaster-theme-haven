@@ -2,8 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AlarmClock, AlarmPlus, Bell, BellPlus, FileText, Link, MessageSquare, Phone, Plus, Share2, Siren } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 interface QuickActionButtonProps {
   icon: React.ReactNode;
@@ -35,32 +33,6 @@ const QuickActionButton = ({ icon, label, onClick, variant = "primary" }: QuickA
 };
 
 const QuickActions = () => {
-  const navigate = useNavigate();
-
-  const handleNewAlert = () => {
-    navigate("/alerts");
-    toast.info("Redirecting to Alerts page to create a new alert");
-  };
-
-  const handleSendNotification = () => {
-    toast.success("Notification sent successfully");
-  };
-
-  const handleCreateReport = () => {
-    navigate("/reports/create");
-    toast.info("Redirecting to create a new report");
-  };
-
-  const handleMakeCall = () => {
-    toast.info("Opening call dialog");
-    // This would typically open a call dialog or integration
-  };
-
-  const handleSendMessage = () => {
-    navigate("/contacts");
-    toast.info("Redirecting to Contacts page to send a message");
-  };
-
   return (
     <div className="p-6 rounded-xl glass transition-all duration-300 ease-in-out animate-in">
       <h3 className="text-lg font-medium mb-4">Quick Actions</h3>
@@ -69,28 +41,23 @@ const QuickActions = () => {
           icon={<Siren />}
           label="New Alert"
           variant="destructive"
-          onClick={handleNewAlert}
         />
         <QuickActionButton
           icon={<BellPlus />}
           label="Notification"
           variant="warning"
-          onClick={handleSendNotification}
         />
         <QuickActionButton
           icon={<FileText />}
           label="Report"
-          onClick={handleCreateReport}
         />
         <QuickActionButton
           icon={<Phone />}
           label="Call"
-          onClick={handleMakeCall}
         />
         <QuickActionButton
           icon={<MessageSquare />}
           label="Message"
-          onClick={handleSendMessage}
         />
       </div>
     </div>

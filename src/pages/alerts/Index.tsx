@@ -22,29 +22,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
 
 const AlertsPage = () => {
   const [alerts, setAlerts] = useState(alertsData);
   const [severityFilter, setSeverityFilter] = useState<string>("all");
   const [selectedAlert, setSelectedAlert] = useState<typeof alertsData[0] | null>(null);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [newAlert, setNewAlert] = useState({
-    title: "",
-    description: "",
-    severity: "medium",
-    affectedAreas: "",
-    population: "",
-    reliefMeasures: "",
-    lat: "",
-    lng: "",
-  });
-  
   const navigate = useNavigate();
 
   const handleDismissAlert = (id: string) => {
@@ -65,36 +49,6 @@ const AlertsPage = () => {
   const handleViewOnMap = () => {
     navigate("/map");
     toast.info("Viewing alerts on global map");
-  };
-  
-  const handleCreateAlert = () => {
-    const alertToAdd = {
-      id: Date.now().toString(),
-      title: newAlert.title,
-      description: newAlert.description,
-      timestamp: new Date(),
-      severity: newAlert.severity as any,
-      read: false,
-      affectedAreas: newAlert.affectedAreas.split(',').map(area => area.trim()),
-      population: parseInt(newAlert.population) || 0,
-      reliefMeasures: newAlert.reliefMeasures.split('\n').filter(measure => measure.trim()),
-      lat: parseFloat(newAlert.lat) || null,
-      lng: parseFloat(newAlert.lng) || null,
-    };
-    
-    setAlerts([alertToAdd, ...alerts]);
-    setNewAlert({
-      title: "",
-      description: "",
-      severity: "medium",
-      affectedAreas: "",
-      population: "",
-      reliefMeasures: "",
-      lat: "",
-      lng: "",
-    });
-    setShowCreateDialog(false);
-    toast.success("Alert created successfully");
   };
 
   const filteredAlerts = alerts.filter(alert => 
@@ -158,10 +112,7 @@ const AlertsPage = () => {
               <MapPin className="h-4 w-4" />
               View on Map
             </Button>
-            <Button 
-              className="gap-2"
-              onClick={() => setShowCreateDialog(true)}
-            >
+            <Button className="gap-2">
               <Plus className="h-4 w-4" />
               Create Alert
             </Button>
@@ -270,122 +221,6 @@ const AlertsPage = () => {
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Create Alert Dialog with Scrollable Content */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Create New Alert</DialogTitle>
-            <DialogDescription>
-              Fill in the details to create a new emergency alert
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4 overflow-y-auto pr-2">
-            <div className="space-y-2">
-              <Label htmlFor="alert-title">Alert Title</Label>
-              <Input 
-                id="alert-title" 
-                value={newAlert.title}
-                onChange={(e) => setNewAlert({...newAlert, title: e.target.value})}
-                placeholder="Brief title for the alert"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="alert-description">Description</Label>
-              <Textarea 
-                id="alert-description" 
-                value={newAlert.description}
-                onChange={(e) => setNewAlert({...newAlert, description: e.target.value})}
-                placeholder="Detailed description of the alert"
-                rows={3}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="alert-severity">Severity Level</Label>
-              <Select 
-                value={newAlert.severity} 
-                onValueChange={(value) => setNewAlert({...newAlert, severity: value})}
-              >
-                <SelectTrigger id="alert-severity">
-                  <SelectValue placeholder="Select severity level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="alert-areas">Affected Areas</Label>
-              <Input 
-                id="alert-areas" 
-                value={newAlert.affectedAreas}
-                onChange={(e) => setNewAlert({...newAlert, affectedAreas: e.target.value})}
-                placeholder="Comma-separated list of areas"
-              />
-              <p className="text-xs text-muted-foreground">Separate multiple areas with commas</p>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="alert-population">Affected Population</Label>
-              <Input 
-                id="alert-population" 
-                type="number"
-                value={newAlert.population}
-                onChange={(e) => setNewAlert({...newAlert, population: e.target.value})}
-                placeholder="Estimated number of people affected"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="alert-lat">Latitude</Label>
-                <Input 
-                  id="alert-lat" 
-                  type="text"
-                  value={newAlert.lat}
-                  onChange={(e) => setNewAlert({...newAlert, lat: e.target.value})}
-                  placeholder="e.g. 37.7749"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="alert-lng">Longitude</Label>
-                <Input 
-                  id="alert-lng" 
-                  type="text"
-                  value={newAlert.lng}
-                  onChange={(e) => setNewAlert({...newAlert, lng: e.target.value})}
-                  placeholder="e.g. -122.4194"
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="alert-relief">Relief Measures</Label>
-              <Textarea 
-                id="alert-relief" 
-                value={newAlert.reliefMeasures}
-                onChange={(e) => setNewAlert({...newAlert, reliefMeasures: e.target.value})}
-                placeholder="Enter each relief measure on a new line"
-                rows={3}
-              />
-              <p className="text-xs text-muted-foreground">Enter each measure on a new line</p>
-            </div>
-          </div>
-          
-          <DialogFooter className="mt-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>Cancel</Button>
-            <Button onClick={handleCreateAlert}>Create Alert</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </DashboardLayout>

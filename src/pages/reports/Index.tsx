@@ -1,573 +1,306 @@
-
-import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  ArrowUpDown, 
-  Download, 
-  FileText, 
-  Filter, 
-  Grid, 
-  List, 
-  MoreHorizontal, 
-  Plus, 
-  Search,
-  Shield, 
-  Users,
-  BarChart,
-  Calendar
-} from "lucide-react";
+import { Plus, Search, Download, FileText, Calendar, Filter, ArrowUpDown, Eye, ArrowUpRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { format } from "date-fns";
-
-// Mock reports data
-const reportData = [
-  {
-    id: "1",
-    title: "Daily Incident Summary",
-    type: "incidents",
-    author: "Admin User",
-    created: new Date("2023-05-28T09:30:00"),
-    status: "published",
-    summary: "Summary of all incidents that occurred in the last 24 hours",
-  },
-  {
-    id: "2",
-    title: "Weekly Resource Allocation",
-    type: "resources",
-    author: "Resource Manager",
-    created: new Date("2023-05-24T14:15:00"),
-    status: "published",
-    summary: "Overview of resource allocation for the week of May 22-28",
-  },
-  {
-    id: "3",
-    title: "Monthly Performance Metrics",
-    type: "performance",
-    author: "Operations Director",
-    created: new Date("2023-05-01T11:00:00"),
-    status: "published",
-    summary: "Key performance indicators for the month of April",
-  },
-  {
-    id: "4",
-    title: "Personnel Training Completion",
-    type: "personnel",
-    author: "Training Coordinator",
-    created: new Date("2023-05-15T16:45:00"),
-    status: "published",
-    summary: "Training completion rates for all personnel",
-  },
-  {
-    id: "5",
-    title: "Quarterly Emergency Response Times",
-    type: "performance",
-    author: "Data Analyst",
-    created: new Date("2023-04-01T10:30:00"),
-    status: "published",
-    summary: "Analysis of emergency response times for Q1 2023",
-  },
-  {
-    id: "6",
-    title: "Draft: Resource Needs Assessment",
-    type: "resources",
-    author: "Planning Team",
-    created: new Date("2023-05-29T15:30:00"),
-    status: "draft",
-    summary: "Assessment of resource needs for upcoming hurricane season",
-  },
-  {
-    id: "7",
-    title: "Post-Incident Analysis",
-    type: "incidents",
-    author: "Incident Commander",
-    created: new Date("2023-05-20T08:15:00"),
-    status: "published",
-    summary: "Detailed analysis of the major flooding incident on May 15-18",
-  },
-  {
-    id: "8",
-    title: "Draft: Personnel Deployment Strategy",
-    type: "personnel",
-    author: "Operations Manager",
-    created: new Date("2023-05-28T17:00:00"),
-    status: "draft",
-    summary: "Strategy for personnel deployment during multiple simultaneous incidents",
-  },
-];
+import { incidentData, responseTimeData, resourceData } from "@/data/mockData";
+import StatisticsCard from "@/components/dashboard/StatisticsCard";
 
 const ReportsPage = () => {
-  const navigate = useNavigate();
-  const [reports, setReports] = useState(reportData);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  
-  // Filter reports based on search, type, and status
-  const filteredReports = reports.filter((report) => {
-    const matchesSearch = report.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         report.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = typeFilter === "all" || report.type === typeFilter;
-    const matchesStatus = statusFilter === "all" || report.status === statusFilter;
-    
-    return matchesSearch && matchesType && matchesStatus;
-  });
-  
-  const handleExport = (id: string) => {
-    toast.success("Report exported successfully");
-  };
-  
-  const handleDelete = (id: string) => {
-    setReports(reports.filter(report => report.id !== id));
-    toast.success("Report deleted successfully");
-  };
-  
-  const handleCreateReport = () => {
-    navigate("/reports/create");
-  };
-  
-  // Helper function to get icon based on report type
-  const getReportIcon = (type: string) => {
-    switch (type) {
-      case "incidents":
-        return <FileText className="h-5 w-5" />;
-      case "resources":
-        return <Shield className="h-5 w-5" />;
-      case "personnel":
-        return <Users className="h-5 w-5" />;
-      case "performance":
-        return <BarChart className="h-5 w-5" />;
-      default:
-        return <FileText className="h-5 w-5" />;
+  const mockReports = [
+    {
+      id: "RPT-2023-001",
+      title: "Monthly Incident Summary - May 2023",
+      type: "Monthly Summary",
+      department: "Operations",
+      author: "John Smith",
+      created: "2023-06-05T14:30:00Z",
+      status: "Published"
+    },
+    {
+      id: "RPT-2023-002",
+      title: "Resource Allocation Analysis Q2 2023",
+      type: "Quarterly Analysis",
+      department: "Resource Management",
+      author: "Emily Johnson",
+      created: "2023-06-02T09:15:00Z",
+      status: "Published"
+    },
+    {
+      id: "RPT-2023-003",
+      title: "Response Time Performance Review",
+      type: "Performance Review",
+      department: "Emergency Services",
+      author: "Michael Chen",
+      created: "2023-05-28T17:45:00Z",
+      status: "Published"
+    },
+    {
+      id: "RPT-2023-004",
+      title: "Downtown Building Fire - Incident Report",
+      type: "Incident Report",
+      department: "Fire Department",
+      author: "Sarah Williams",
+      created: "2023-06-10T20:30:00Z",
+      status: "Draft"
+    },
+    {
+      id: "RPT-2023-005",
+      title: "Personnel Training Compliance Report",
+      type: "Compliance Report",
+      department: "HR & Training",
+      author: "David Rodriguez",
+      created: "2023-06-08T10:30:00Z",
+      status: "In Review"
+    },
+    {
+      id: "RPT-2023-006",
+      title: "Annual Budget Forecast - FY 2023-2024",
+      type: "Financial Report",
+      department: "Finance",
+      author: "Lisa Thompson",
+      created: "2023-06-01T11:30:00Z",
+      status: "In Review"
+    }
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Published": return "bg-green-500";
+      case "Draft": return "bg-yellow-500";
+      case "In Review": return "bg-blue-500";
+      default: return "bg-gray-500";
     }
   };
-  
-  // Helper function to get badge color based on report type
-  const getReportBadgeStyle = (type: string) => {
-    switch (type) {
-      case "incidents":
-        return "bg-destructive/10 text-destructive hover:bg-destructive/20";
-      case "resources":
-        return "bg-warning/10 text-warning hover:bg-warning/20";
-      case "personnel":
-        return "bg-info/10 text-info hover:bg-info/20";
-      case "performance":
-        return "bg-primary/10 text-primary hover:bg-primary/20";
-      default:
-        return "bg-secondary text-secondary-foreground";
-    }
-  };
-  
+
   return (
     <DashboardLayout>
       <Header 
-        title="Reports & Analysis" 
-        subtitle="View, create, and export system reports"
+        title="Reports Management" 
+        subtitle="Generate and access incident and resource reports"
       />
       
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2">
+          <StatisticsCard
+            title="Incident Trend"
+            subtitle="Daily incidents over the past week"
+            data={incidentData}
+            color="rgba(220, 38, 38, 0.8)"
+          />
+        </div>
+        <div>
+          <StatisticsCard
+            title="Response Time"
+            subtitle="Average response time (minutes)"
+            data={responseTimeData}
+            color="rgba(37, 99, 235, 0.8)"
+          />
+        </div>
+      </div>
+      
       <div className="mb-6">
-        <Tabs defaultValue="all-reports" className="w-full">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
+        <Tabs defaultValue="all" className="w-full">
+          <div className="flex justify-between items-center mb-4">
             <TabsList>
-              <TabsTrigger value="all-reports">All Reports</TabsTrigger>
-              <TabsTrigger value="incident-reports">Incident</TabsTrigger>
-              <TabsTrigger value="resource-reports">Resource</TabsTrigger>
-              <TabsTrigger value="personnel-reports">Personnel</TabsTrigger>
-              <TabsTrigger value="performance-reports">Performance</TabsTrigger>
+              <TabsTrigger value="all">All Reports</TabsTrigger>
+              <TabsTrigger value="incidents">Incident Reports</TabsTrigger>
+              <TabsTrigger value="resources">Resource Reports</TabsTrigger>
+              <TabsTrigger value="personnel">Personnel Reports</TabsTrigger>
+              <TabsTrigger value="performance">Performance Reports</TabsTrigger>
             </TabsList>
-            
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setViewMode("list")}
-                className={viewMode === "list" ? "bg-secondary" : ""}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                className={viewMode === "grid" ? "bg-secondary" : ""}
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() => toast.success("Reports exported successfully")}
-              >
-                <Download className="h-4 w-4" />
-                Export All
-              </Button>
-              <Button className="gap-2" onClick={handleCreateReport}>
-                <Plus className="h-4 w-4" />
-                Create Report
-              </Button>
-            </div>
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create Report
+            </Button>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search reports..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Select
-                value={typeFilter}
-                onValueChange={setTypeFilter}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Report Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="incidents">Incidents</SelectItem>
-                  <SelectItem value="resources">Resources</SelectItem>
-                  <SelectItem value="personnel">Personnel</SelectItem>
-                  <SelectItem value="performance">Performance</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select
-                value={statusFilter}
-                onValueChange={setStatusFilter}
-              >
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <TabsContent value="all-reports">
-            {viewMode === "list" ? (
-              <div className="p-6 rounded-xl glass">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Report</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Author</TableHead>
-                      <TableHead>
-                        <Button variant="ghost" className="gap-1 p-0 h-auto font-medium" onClick={() => {
-                          setReports([...reports].sort((a, b) => a.created.getTime() - b.created.getTime()));
-                        }}>
-                          Date <ArrowUpDown className="h-3 w-3" />
-                        </Button>
-                      </TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredReports.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                          No reports found
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredReports.map((report) => (
-                        <TableRow key={report.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className={`p-2 rounded-lg ${getReportBadgeStyle(report.type)}`}>
-                                {getReportIcon(report.type)}
-                              </div>
-                              <div>
-                                <div className="font-medium">{report.title}</div>
-                                <div className="text-sm text-muted-foreground line-clamp-1">{report.summary}</div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className={getReportBadgeStyle(report.type)}>
-                              {report.type}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{report.author}</TableCell>
-                          <TableCell>{format(report.created, "PPP")}</TableCell>
-                          <TableCell>
-                            <Badge variant={report.status === "published" ? "default" : "secondary"}>
-                              {report.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => navigate(`/reports/${report.id}`)}>
-                                  View Report
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleExport(report.id)}>
-                                  Export
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="text-destructive"
-                                  onClick={() => handleDelete(report.id)}
-                                >
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+          <TabsContent value="all" className="mt-0">
+            <div className="p-6 rounded-xl glass transition-all duration-300 ease-in-out">
+              <div className="flex justify-between mb-4">
+                <div className="relative w-64">
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search reports..." 
+                    className="pl-8"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    Filter
+                  </Button>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <ArrowUpDown className="h-4 w-4" />
+                    Sort
+                  </Button>
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredReports.length === 0 ? (
-                  <div className="col-span-full p-6 rounded-xl glass text-center text-muted-foreground">
-                    No reports found
-                  </div>
-                ) : (
-                  filteredReports.map((report) => (
-                    <Card key={report.id} className="overflow-hidden">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <Badge variant="outline" className={getReportBadgeStyle(report.type)}>
-                            {report.type}
-                          </Badge>
-                          <Badge variant={report.status === "published" ? "default" : "secondary"}>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b text-left">
+                      <th className="pb-2 font-medium">Report ID</th>
+                      <th className="pb-2 font-medium">Title</th>
+                      <th className="pb-2 font-medium">Type</th>
+                      <th className="pb-2 font-medium">Department</th>
+                      <th className="pb-2 font-medium">Date</th>
+                      <th className="pb-2 font-medium">Status</th>
+                      <th className="pb-2 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockReports.map((report) => (
+                      <tr key={report.id} className="border-b hover:bg-accent/10">
+                        <td className="py-3 text-sm font-mono">{report.id}</td>
+                        <td className="py-3">
+                          <div className="font-medium">{report.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            By {report.author}
+                          </div>
+                        </td>
+                        <td className="py-3">{report.type}</td>
+                        <td className="py-3">{report.department}</td>
+                        <td className="py-3">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>{new Date(report.created).toLocaleDateString()}</span>
+                          </div>
+                        </td>
+                        <td className="py-3">
+                          <span className={`${getStatusColor(report.status)} text-white text-xs font-medium py-1 px-2 rounded-full`}>
                             {report.status}
-                          </Badge>
-                        </div>
-                        <CardTitle className="mt-2">{report.title}</CardTitle>
-                        <CardDescription>
-                          By {report.author} • {format(report.created, "PPP")}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground">{report.summary}</p>
-                      </CardContent>
-                      <CardFooter className="flex justify-between pt-2 border-t">
-                        <Button variant="ghost" className="text-xs h-8" onClick={() => navigate(`/reports/${report.id}`)}>
-                          View Report
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
+                          </span>
+                        </td>
+                        <td className="py-3">
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" className="h-8">
+                              <Eye className="h-3.5 w-3.5 mr-1" />
+                              View
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleExport(report.id)}>
+                            <Button variant="ghost" size="sm" className="h-8">
+                              <Download className="h-3.5 w-3.5 mr-1" />
                               Export
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => handleDelete(report.id)}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </CardFooter>
-                    </Card>
-                  ))
-                )}
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="incident-reports">
-            <div className="p-6 rounded-xl glass">
-              <h3 className="text-lg font-medium mb-4">Incident Reports</h3>
-              <p>View reports related to emergency incidents, response times, and outcomes.</p>
-              
-              <div className="mt-6 space-y-4">
-                {filteredReports
-                  .filter(report => report.type === "incidents")
-                  .map(report => (
-                    <div key={report.id} className="flex justify-between p-4 border rounded-lg bg-card">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
-                          <FileText className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{report.title}</h4>
-                          <p className="text-sm text-muted-foreground">{format(report.created, "PPP")}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="gap-1" onClick={() => handleExport(report.id)}>
-                        <Download className="h-3.5 w-3.5" />
-                        Export
-                      </Button>
-                    </div>
-                  ))}
-                
-                {filteredReports.filter(report => report.type === "incidents").length === 0 && (
-                  <p className="text-center text-muted-foreground p-6">No incident reports found</p>
-                )}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </TabsContent>
           
-          <TabsContent value="resource-reports">
+          {/* Other tabs would follow the same pattern */}
+          <TabsContent value="incidents" className="mt-0">
             <div className="p-6 rounded-xl glass">
-              <h3 className="text-lg font-medium mb-4">Resource Reports</h3>
-              <p>View reports on resource allocation, usage, and availability.</p>
-              
-              <div className="mt-6 space-y-4">
-                {filteredReports
-                  .filter(report => report.type === "resources")
-                  .map(report => (
-                    <div key={report.id} className="flex justify-between p-4 border rounded-lg bg-card">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 rounded-lg bg-warning/10 text-warning">
-                          <Shield className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{report.title}</h4>
-                          <p className="text-sm text-muted-foreground">{format(report.created, "PPP")}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="gap-1" onClick={() => handleExport(report.id)}>
-                        <Download className="h-3.5 w-3.5" />
-                        Export
-                      </Button>
-                    </div>
-                  ))}
-                
-                {filteredReports.filter(report => report.type === "resources").length === 0 && (
-                  <p className="text-center text-muted-foreground p-6">No resource reports found</p>
-                )}
-              </div>
+              <p className="text-center text-muted-foreground">Showing Incident Reports</p>
             </div>
           </TabsContent>
-          
-          <TabsContent value="personnel-reports">
+          <TabsContent value="resources" className="mt-0">
             <div className="p-6 rounded-xl glass">
-              <h3 className="text-lg font-medium mb-4">Personnel Reports</h3>
-              <p>View reports on personnel deployment, training, and performance.</p>
-              
-              <div className="mt-6 space-y-4">
-                {filteredReports
-                  .filter(report => report.type === "personnel")
-                  .map(report => (
-                    <div key={report.id} className="flex justify-between p-4 border rounded-lg bg-card">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 rounded-lg bg-info/10 text-info">
-                          <Users className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{report.title}</h4>
-                          <p className="text-sm text-muted-foreground">{format(report.created, "PPP")}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="gap-1" onClick={() => handleExport(report.id)}>
-                        <Download className="h-3.5 w-3.5" />
-                        Export
-                      </Button>
-                    </div>
-                  ))}
-                
-                {filteredReports.filter(report => report.type === "personnel").length === 0 && (
-                  <p className="text-center text-muted-foreground p-6">No personnel reports found</p>
-                )}
-              </div>
+              <p className="text-center text-muted-foreground">Showing Resource Reports</p>
             </div>
           </TabsContent>
-          
-          <TabsContent value="performance-reports">
+          <TabsContent value="personnel" className="mt-0">
             <div className="p-6 rounded-xl glass">
-              <h3 className="text-lg font-medium mb-4">Performance Reports</h3>
-              <p>View reports on system performance, metrics, and analytics.</p>
-              
-              <div className="mt-6 space-y-4">
-                {filteredReports
-                  .filter(report => report.type === "performance")
-                  .map(report => (
-                    <div key={report.id} className="flex justify-between p-4 border rounded-lg bg-card">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                          <BarChart className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{report.title}</h4>
-                          <p className="text-sm text-muted-foreground">{format(report.created, "PPP")}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="gap-1" onClick={() => handleExport(report.id)}>
-                        <Download className="h-3.5 w-3.5" />
-                        Export
-                      </Button>
-                    </div>
-                  ))}
-                
-                {filteredReports.filter(report => report.type === "performance").length === 0 && (
-                  <p className="text-center text-muted-foreground p-6">No performance reports found</p>
-                )}
-              </div>
+              <p className="text-center text-muted-foreground">Showing Personnel Reports</p>
+            </div>
+          </TabsContent>
+          <TabsContent value="performance" className="mt-0">
+            <div className="p-6 rounded-xl glass">
+              <p className="text-center text-muted-foreground">Showing Performance Reports</p>
             </div>
           </TabsContent>
         </Tabs>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="col-span-2 p-4 rounded-xl glass">
+          <h3 className="text-lg font-medium mb-3">Report Templates</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="border rounded-lg p-3 hover:border-primary/50 hover:bg-accent/20 transition-colors cursor-pointer">
+              <div className="flex items-center justify-center h-12 w-12 bg-red-100 text-red-800 rounded-lg mb-2">
+                <FileText className="h-6 w-6" />
+              </div>
+              <h4 className="font-medium">Incident Report</h4>
+              <p className="text-xs text-muted-foreground mb-3">Standard template for documenting incidents</p>
+              <Button variant="ghost" size="sm" className="w-full gap-1">
+                <Plus className="h-3.5 w-3.5" />
+                Create
+              </Button>
+            </div>
+            
+            <div className="border rounded-lg p-3 hover:border-primary/50 hover:bg-accent/20 transition-colors cursor-pointer">
+              <div className="flex items-center justify-center h-12 w-12 bg-blue-100 text-blue-800 rounded-lg mb-2">
+                <FileText className="h-6 w-6" />
+              </div>
+              <h4 className="font-medium">Resource Status</h4>
+              <p className="text-xs text-muted-foreground mb-3">Template for resource allocation reports</p>
+              <Button variant="ghost" size="sm" className="w-full gap-1">
+                <Plus className="h-3.5 w-3.5" />
+                Create
+              </Button>
+            </div>
+            
+            <div className="border rounded-lg p-3 hover:border-primary/50 hover:bg-accent/20 transition-colors cursor-pointer">
+              <div className="flex items-center justify-center h-12 w-12 bg-green-100 text-green-800 rounded-lg mb-2">
+                <FileText className="h-6 w-6" />
+              </div>
+              <h4 className="font-medium">Situation Report</h4>
+              <p className="text-xs text-muted-foreground mb-3">For ongoing emergency situations</p>
+              <Button variant="ghost" size="sm" className="w-full gap-1">
+                <Plus className="h-3.5 w-3.5" />
+                Create
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-4 rounded-xl glass">
+          <h3 className="text-lg font-medium mb-3">Report Analytics</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span>Incidents</span>
+              <div className="flex items-center gap-1 text-green-600">
+                <span className="font-medium">24</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Resources</span>
+              <div className="flex items-center gap-1 text-red-600">
+                <span className="font-medium">12</span>
+                <ArrowUpRight className="h-4 w-4 transform rotate-90" />
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Personnel</span>
+              <div className="flex items-center gap-1 text-green-600">
+                <span className="font-medium">18</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Performance</span>
+              <div className="flex items-center gap-1 text-green-600">
+                <span className="font-medium">9</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="border-t pt-3 mt-4">
+              <div className="text-sm text-muted-foreground">Total reports this month</div>
+              <div className="text-2xl font-bold">63</div>
+              <div className="text-xs text-green-600 flex items-center gap-1">
+                <ArrowUpRight className="h-3 w-3" />
+                23% increase from last month
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

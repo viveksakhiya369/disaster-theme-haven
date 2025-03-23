@@ -12,11 +12,10 @@ import {
   Shield, 
   Users 
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/ThemeProvider";
 
 interface NavItemProps {
   icon: React.ElementType;
@@ -50,7 +49,7 @@ const NavItem = ({ icon: Icon, label, to, active, hasAlert, onClick }: NavItemPr
         )}
         <div
           className={cn(
-            "absolute left-0 top-0 h-full w-0.5 bg-primary scale-y-0 transition-transform origin-center duration-150 ease-out",
+            "absolute left-0 top-0 h-full w-0.5 bg-sidebar-primary scale-y-0 transition-transform origin-center duration-150 ease-out",
             active && "scale-y-100"
           )}
         />
@@ -62,7 +61,7 @@ const NavItem = ({ icon: Icon, label, to, active, hasAlert, onClick }: NavItemPr
 const Sidebar = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  
+
   // Define route paths and their corresponding labels
   const pathToLabel: Record<string, string> = {
     "/": "Dashboard",
@@ -93,20 +92,6 @@ const Sidebar = () => {
     { icon: Settings, label: "Settings", to: "/settings", hasAlert: false },
   ];
 
-  // Add event listener for keyboard shortcut
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'b') {
-        setCollapsed(prev => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
   return (
     <div 
       className={cn(
@@ -117,7 +102,7 @@ const Sidebar = () => {
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
           <Link to="/" className="text-sidebar-foreground font-semibold text-xl">
-            Disaster<span className="text-primary">Ctrl</span>
+            Disaster<span className="text-sidebar-primary">Ctrl</span>
           </Link>
         )}
         <Button 
@@ -125,7 +110,6 @@ const Sidebar = () => {
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
           className="text-sidebar-foreground hover:bg-sidebar-accent/60"
-          title={collapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -145,7 +129,7 @@ const Sidebar = () => {
       <div className="p-4 border-t border-sidebar-border">
         {!collapsed && (
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium">
+            <div className="h-8 w-8 rounded-full bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground font-medium">
               AD
             </div>
             <div>
