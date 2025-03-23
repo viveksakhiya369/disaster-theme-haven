@@ -1,4 +1,3 @@
-
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
@@ -7,8 +6,41 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/components/ThemeProvider";
+import { useToast } from "@/hooks/use-toast";
 
 const SettingsPage = () => {
+  const { theme, setTheme, accentColor, setAccentColor } = useTheme();
+  const { toast } = useToast();
+  
+  const handleSaveAppearance = () => {
+    toast({
+      title: "Appearance settings saved",
+      description: "Your theme preferences have been updated.",
+    });
+  };
+  
+  const handleSaveNotifications = () => {
+    toast({
+      title: "Notification preferences saved",
+      description: "Your notification settings have been updated.",
+    });
+  };
+  
+  const handleSavePassword = () => {
+    toast({
+      title: "Security settings updated",
+      description: "Your password has been changed successfully.",
+    });
+  };
+  
+  const handleSaveSystemSettings = () => {
+    toast({
+      title: "System settings saved",
+      description: "Your system preferences have been updated.",
+    });
+  };
+  
   return (
     <DashboardLayout>
       <Header 
@@ -103,7 +135,7 @@ const SettingsPage = () => {
                     <p className="font-medium">Alert Notifications</p>
                     <p className="text-sm text-muted-foreground">Receive notifications for new alerts</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked id="alert-notifications" />
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -111,7 +143,7 @@ const SettingsPage = () => {
                     <p className="font-medium">Incident Updates</p>
                     <p className="text-sm text-muted-foreground">Get notified about changes to incidents</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked id="incident-updates" />
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -119,7 +151,7 @@ const SettingsPage = () => {
                     <p className="font-medium">Resource Allocations</p>
                     <p className="text-sm text-muted-foreground">Receive notifications about resource changes</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked id="resource-allocations" />
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -127,7 +159,7 @@ const SettingsPage = () => {
                     <p className="font-medium">System Updates</p>
                     <p className="text-sm text-muted-foreground">Get notified about system maintenance</p>
                   </div>
-                  <Switch />
+                  <Switch id="system-updates" />
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -135,7 +167,7 @@ const SettingsPage = () => {
                     <p className="font-medium">Email Notifications</p>
                     <p className="text-sm text-muted-foreground">Receive email copies of important notifications</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked id="email-notifications" />
                 </div>
               </div>
               
@@ -156,7 +188,7 @@ const SettingsPage = () => {
               </div>
               
               <div className="border-t pt-6 flex justify-end">
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={handleSaveNotifications}>
                   <Save className="h-4 w-4" />
                   Save Preferences
                 </Button>
@@ -172,15 +204,24 @@ const SettingsPage = () => {
                 <div>
                   <h4 className="font-medium mb-3">Theme Preference</h4>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer">
+                    <div 
+                      className={`border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer ${theme === 'light' ? 'border-primary' : ''}`}
+                      onClick={() => setTheme('light')}
+                    >
                       <Sun className="h-8 w-8 mb-2" />
                       <span className="text-sm">Light Mode</span>
                     </div>
-                    <div className="border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer">
+                    <div 
+                      className={`border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer ${theme === 'dark' ? 'border-primary' : ''}`}
+                      onClick={() => setTheme('dark')}
+                    >
                       <Moon className="h-8 w-8 mb-2" />
                       <span className="text-sm">Dark Mode</span>
                     </div>
-                    <div className="border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer border-primary">
+                    <div 
+                      className={`border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer ${theme === 'system' ? 'border-primary' : ''}`}
+                      onClick={() => setTheme('system')}
+                    >
                       <Monitor className="h-8 w-8 mb-2" />
                       <span className="text-sm">System Default</span>
                     </div>
@@ -190,12 +231,30 @@ const SettingsPage = () => {
                 <div className="border-t pt-4">
                   <h4 className="font-medium mb-3">Color Accent</h4>
                   <div className="flex flex-wrap gap-3">
-                    <div className="h-8 w-8 rounded-full bg-blue-600 cursor-pointer border-2 border-white"></div>
-                    <div className="h-8 w-8 rounded-full bg-green-600 cursor-pointer"></div>
-                    <div className="h-8 w-8 rounded-full bg-red-600 cursor-pointer"></div>
-                    <div className="h-8 w-8 rounded-full bg-purple-600 cursor-pointer"></div>
-                    <div className="h-8 w-8 rounded-full bg-amber-500 cursor-pointer"></div>
-                    <div className="h-8 w-8 rounded-full bg-pink-600 cursor-pointer"></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-blue-600 cursor-pointer ${accentColor === 'blue' ? 'ring-2 ring-offset-2 ring-blue-600' : ''}`}
+                      onClick={() => setAccentColor('blue')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-green-600 cursor-pointer ${accentColor === 'green' ? 'ring-2 ring-offset-2 ring-green-600' : ''}`}
+                      onClick={() => setAccentColor('green')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-red-600 cursor-pointer ${accentColor === 'red' ? 'ring-2 ring-offset-2 ring-red-600' : ''}`}
+                      onClick={() => setAccentColor('red')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-purple-600 cursor-pointer ${accentColor === 'purple' ? 'ring-2 ring-offset-2 ring-purple-600' : ''}`}
+                      onClick={() => setAccentColor('purple')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-amber-500 cursor-pointer ${accentColor === 'amber' ? 'ring-2 ring-offset-2 ring-amber-500' : ''}`}
+                      onClick={() => setAccentColor('amber')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-pink-600 cursor-pointer ${accentColor === 'pink' ? 'ring-2 ring-offset-2 ring-pink-600' : ''}`}
+                      onClick={() => setAccentColor('pink')}
+                    ></div>
                   </div>
                 </div>
                 
@@ -207,7 +266,7 @@ const SettingsPage = () => {
                         <p className="font-medium">Increased Contrast</p>
                         <p className="text-sm text-muted-foreground">Enhance visual distinction between elements</p>
                       </div>
-                      <Switch />
+                      <Switch id="increased-contrast" />
                     </div>
                     
                     <div className="flex items-center justify-between">
@@ -215,7 +274,7 @@ const SettingsPage = () => {
                         <p className="font-medium">Reduced Motion</p>
                         <p className="text-sm text-muted-foreground">Minimize animations and transitions</p>
                       </div>
-                      <Switch />
+                      <Switch id="reduced-motion" />
                     </div>
                     
                     <div className="flex items-center justify-between">
@@ -223,14 +282,14 @@ const SettingsPage = () => {
                         <p className="font-medium">Larger Text</p>
                         <p className="text-sm text-muted-foreground">Increase default font size throughout the app</p>
                       </div>
-                      <Switch />
+                      <Switch id="larger-text" />
                     </div>
                   </div>
                 </div>
               </div>
               
               <div className="border-t pt-6 flex justify-end">
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={handleSaveAppearance}>
                   <Save className="h-4 w-4" />
                   Apply Changes
                 </Button>
@@ -263,56 +322,8 @@ const SettingsPage = () => {
                 <p className="text-sm text-muted-foreground">Password must be at least 12 characters and include uppercase, lowercase, numbers, and symbols</p>
               </div>
               
-              <div className="border-t pt-4 mt-4">
-                <h4 className="font-medium mb-3">Two-Factor Authentication</h4>
-                
-                <div className="p-4 border border-primary/20 rounded-lg bg-primary/5 mb-4">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="font-medium">Two-factor authentication is not enabled</p>
-                      <p className="text-sm text-muted-foreground">Enable two-factor authentication for enhanced account security</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <Button variant="outline">Enable Two-Factor Authentication</Button>
-              </div>
-              
-              <div className="border-t pt-4 mt-4">
-                <h4 className="font-medium mb-3">Session Management</h4>
-                
-                <div className="space-y-3">
-                  <div className="p-3 border rounded-lg">
-                    <div className="flex justify-between">
-                      <div>
-                        <p className="font-medium">Current Session</p>
-                        <p className="text-sm text-muted-foreground">Chrome on Windows • IP: 192.168.1.1</p>
-                        <p className="text-xs text-muted-foreground">Started 2 hours ago</p>
-                      </div>
-                      <div className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full h-fit">
-                        Active
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="p-3 border rounded-lg">
-                    <div className="flex justify-between">
-                      <div>
-                        <p className="font-medium">Mobile App</p>
-                        <p className="text-sm text-muted-foreground">iPhone • IP: 192.168.1.2</p>
-                        <p className="text-xs text-muted-foreground">Last active 2 days ago</p>
-                      </div>
-                      <Button variant="ghost" size="sm" className="h-8 text-destructive">
-                        Sign Out
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
               <div className="border-t pt-6 flex justify-end">
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={handleSavePassword}>
                   <Save className="h-4 w-4" />
                   Save Security Settings
                 </Button>
@@ -330,7 +341,7 @@ const SettingsPage = () => {
                     <p className="font-medium">Automatic Data Refresh</p>
                     <p className="text-sm text-muted-foreground">Automatically update dashboard data</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked id="auto-refresh" />
                 </div>
                 
                 <div className="space-y-2">
@@ -343,7 +354,7 @@ const SettingsPage = () => {
                     <p className="font-medium">Sound Alerts</p>
                     <p className="text-sm text-muted-foreground">Play sound when new alerts arrive</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch defaultChecked id="sound-alerts" />
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -351,57 +362,12 @@ const SettingsPage = () => {
                     <p className="font-medium">Offline Mode</p>
                     <p className="text-sm text-muted-foreground">Cache data for offline access</p>
                   </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Analytics Collection</p>
-                    <p className="text-sm text-muted-foreground">Share anonymous usage data to improve the system</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </div>
-              
-              <div className="border-t pt-4 mt-4">
-                <h4 className="font-medium mb-3">Data Management</h4>
-                
-                <div className="space-y-3">
-                  <Button variant="outline" className="w-full sm:w-auto">Export System Data</Button>
-                  <Button variant="outline" className="w-full sm:w-auto">Import Configuration</Button>
-                  <Button variant="outline" className="w-full sm:w-auto text-destructive">Clear Local Cache</Button>
-                </div>
-              </div>
-              
-              <div className="border-t pt-4 mt-4">
-                <h4 className="font-medium mb-3">System Information</h4>
-                
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Version</span>
-                    <span>DisasterCtrl v2.5.1</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Last Updated</span>
-                    <span>June 10, 2023</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Server Status</span>
-                    <span className="text-green-600">Online</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Database</span>
-                    <span>Connected</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">API Status</span>
-                    <span>Operational</span>
-                  </div>
+                  <Switch defaultChecked id="offline-mode" />
                 </div>
               </div>
               
               <div className="border-t pt-6 flex justify-end">
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={handleSaveSystemSettings}>
                   <Save className="h-4 w-4" />
                   Save System Settings
                 </Button>
