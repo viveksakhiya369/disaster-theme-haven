@@ -22,11 +22,19 @@ import ForgotPasswordPage from "./pages/auth/ForgotPassword";
 import PersonnelProfilePage from "./pages/personnel/ProfileView";
 import CreateReportPage from "./pages/reports/CreateReport";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: true,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
+    <ThemeProvider defaultTheme="system">
       <TooltipProvider>
         <Toaster />
         <Sonner />

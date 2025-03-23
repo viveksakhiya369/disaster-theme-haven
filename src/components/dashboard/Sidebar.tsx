@@ -12,10 +12,11 @@ import {
   Shield, 
   Users 
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/ThemeProvider";
 
 interface NavItemProps {
   icon: React.ElementType;
@@ -61,6 +62,7 @@ const NavItem = ({ icon: Icon, label, to, active, hasAlert, onClick }: NavItemPr
 const Sidebar = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { theme } = useTheme();
 
   // Define route paths and their corresponding labels
   const pathToLabel: Record<string, string> = {
@@ -92,6 +94,20 @@ const Sidebar = () => {
     { icon: Settings, label: "Settings", to: "/settings", hasAlert: false },
   ];
 
+  // Add event listener for keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'b') {
+        setCollapsed(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <div 
       className={cn(
@@ -110,6 +126,7 @@ const Sidebar = () => {
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
           className="text-sidebar-foreground hover:bg-sidebar-accent/60"
+          title={collapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
         >
           <Menu className="h-5 w-5" />
         </Button>

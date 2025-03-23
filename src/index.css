@@ -109,6 +109,26 @@
     --primary: 335.1 88.4% 60%;
     --primary-foreground: 0 0% 98%;
   }
+  
+  .accent-teal {
+    --primary: 174 76% 42%;
+    --primary-foreground: 0 0% 98%;
+  }
+  
+  .accent-indigo {
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 98%;
+  }
+  
+  .accent-cyan {
+    --primary: 195 83% 58%;
+    --primary-foreground: 0 0% 10%;
+  }
+  
+  .accent-orange {
+    --primary: 21 91% 54%;
+    --primary-foreground: 0 0% 98%;
+  }
 
   .animate-pulse-gentle {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -134,5 +154,37 @@
     to {
       opacity: 1;
     }
+  }
+  
+  /* Font size classes */
+  .text-size-normal {
+    font-size: 1rem;
+  }
+  
+  .text-size-large {
+    font-size: 1.125rem;
+  }
+  
+  .text-size-larger {
+    font-size: 1.25rem;
+  }
+  
+  /* Reduced motion */
+  .reduced-motion * {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+  
+  /* High contrast */
+  .high-contrast {
+    --border: 0 0% 40%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 80%;
+  }
+  
+  .high-contrast.dark {
+    --border: 0 0% 60%;
+    --muted: 0 0% 30%;
+    --muted-foreground: 0 0% 90%;
   }
 }

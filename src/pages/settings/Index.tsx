@@ -1,7 +1,22 @@
+
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
-import { Bell, User, Lock, Globe, Monitor, Moon, Sun, Palette, Save, AlertTriangle } from "lucide-react";
+import { 
+  Bell, 
+  User, 
+  Lock, 
+  Globe, 
+  Monitor, 
+  Moon, 
+  Sun, 
+  Palette, 
+  Save, 
+  Type, 
+  ZoomIn, 
+  MousePointerClick, 
+  EyeOff
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -10,7 +25,19 @@ import { useTheme } from "@/components/ThemeProvider";
 import { useToast } from "@/hooks/use-toast";
 
 const SettingsPage = () => {
-  const { theme, setTheme, accentColor, setAccentColor } = useTheme();
+  const { 
+    theme, 
+    setTheme, 
+    accentColor, 
+    setAccentColor,
+    fontSize,
+    setFontSize,
+    reducedMotion,
+    setReducedMotion,
+    highContrast,
+    setHighContrast
+  } = useTheme();
+  
   const { toast } = useToast();
   
   const handleSaveAppearance = () => {
@@ -255,6 +282,49 @@ const SettingsPage = () => {
                       className={`h-8 w-8 rounded-full bg-pink-600 cursor-pointer ${accentColor === 'pink' ? 'ring-2 ring-offset-2 ring-pink-600' : ''}`}
                       onClick={() => setAccentColor('pink')}
                     ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-teal-600 cursor-pointer ${accentColor === 'teal' ? 'ring-2 ring-offset-2 ring-teal-600' : ''}`}
+                      onClick={() => setAccentColor('teal')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-indigo-600 cursor-pointer ${accentColor === 'indigo' ? 'ring-2 ring-offset-2 ring-indigo-600' : ''}`}
+                      onClick={() => setAccentColor('indigo')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-cyan-600 cursor-pointer ${accentColor === 'cyan' ? 'ring-2 ring-offset-2 ring-cyan-600' : ''}`}
+                      onClick={() => setAccentColor('cyan')}
+                    ></div>
+                    <div 
+                      className={`h-8 w-8 rounded-full bg-orange-600 cursor-pointer ${accentColor === 'orange' ? 'ring-2 ring-offset-2 ring-orange-600' : ''}`}
+                      onClick={() => setAccentColor('orange')}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-3">Text Size</h4>
+                  <div className="flex gap-3">
+                    <div 
+                      className={`border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer ${fontSize === 'normal' ? 'border-primary' : ''}`}
+                      onClick={() => setFontSize('normal')}
+                    >
+                      <Type className="h-6 w-6 mb-2" />
+                      <span className="text-sm">Normal</span>
+                    </div>
+                    <div 
+                      className={`border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer ${fontSize === 'large' ? 'border-primary' : ''}`}
+                      onClick={() => setFontSize('large')}
+                    >
+                      <Type className="h-7 w-7 mb-2" />
+                      <span className="text-sm">Large</span>
+                    </div>
+                    <div 
+                      className={`border rounded-lg p-4 flex flex-col items-center hover:border-primary cursor-pointer ${fontSize === 'larger' ? 'border-primary' : ''}`}
+                      onClick={() => setFontSize('larger')}
+                    >
+                      <Type className="h-8 w-8 mb-2" />
+                      <span className="text-sm">Larger</span>
+                    </div>
                   </div>
                 </div>
                 
@@ -266,7 +336,11 @@ const SettingsPage = () => {
                         <p className="font-medium">Increased Contrast</p>
                         <p className="text-sm text-muted-foreground">Enhance visual distinction between elements</p>
                       </div>
-                      <Switch id="increased-contrast" />
+                      <Switch 
+                        id="increased-contrast"
+                        checked={highContrast}
+                        onCheckedChange={setHighContrast}
+                      />
                     </div>
                     
                     <div className="flex items-center justify-between">
@@ -274,15 +348,11 @@ const SettingsPage = () => {
                         <p className="font-medium">Reduced Motion</p>
                         <p className="text-sm text-muted-foreground">Minimize animations and transitions</p>
                       </div>
-                      <Switch id="reduced-motion" />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Larger Text</p>
-                        <p className="text-sm text-muted-foreground">Increase default font size throughout the app</p>
-                      </div>
-                      <Switch id="larger-text" />
+                      <Switch 
+                        id="reduced-motion"
+                        checked={reducedMotion}
+                        onCheckedChange={setReducedMotion}
+                      />
                     </div>
                   </div>
                 </div>

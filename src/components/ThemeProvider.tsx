@@ -2,6 +2,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
+type FontSize = "normal" | "large" | "larger";
+
 type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
@@ -13,6 +15,12 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void;
   accentColor: string;
   setAccentColor: (color: string) => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+  reducedMotion: boolean;
+  setReducedMotion: (reduced: boolean) => void;
+  highContrast: boolean;
+  setHighContrast: (contrast: boolean) => void;
 };
 
 const initialState: ThemeProviderState = {
@@ -20,6 +28,12 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
   accentColor: "blue",
   setAccentColor: () => null,
+  fontSize: "normal",
+  setFontSize: () => null,
+  reducedMotion: false,
+  setReducedMotion: () => null,
+  highContrast: false,
+  setHighContrast: () => null,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -36,6 +50,18 @@ export function ThemeProvider({
   
   const [accentColor, setAccentColor] = useState<string>(
     () => localStorage.getItem("ui-accent") || "blue"
+  );
+
+  const [fontSize, setFontSize] = useState<FontSize>(
+    () => (localStorage.getItem("ui-font-size") as FontSize) || "normal"
+  );
+
+  const [reducedMotion, setReducedMotion] = useState<boolean>(
+    () => localStorage.getItem("ui-reduced-motion") === "true"
+  );
+
+  const [highContrast, setHighContrast] = useState<boolean>(
+    () => localStorage.getItem("ui-high-contrast") === "true"
   );
 
   useEffect(() => {
@@ -71,6 +97,43 @@ export function ThemeProvider({
     root.classList.add(`accent-${accentColor}`);
   }, [accentColor]);
 
+  useEffect(() => {
+    localStorage.setItem("ui-font-size", fontSize);
+    const root = window.document.documentElement;
+    
+    // Remove any existing font size classes
+    root.classList.forEach(className => {
+      if (className.startsWith('text-size-')) {
+        root.classList.remove(className);
+      }
+    });
+    
+    // Add the new font size class
+    root.classList.add(`text-size-${fontSize}`);
+  }, [fontSize]);
+
+  useEffect(() => {
+    localStorage.setItem("ui-reduced-motion", reducedMotion.toString());
+    const root = window.document.documentElement;
+    
+    if (reducedMotion) {
+      root.classList.add('reduced-motion');
+    } else {
+      root.classList.remove('reduced-motion');
+    }
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    localStorage.setItem("ui-high-contrast", highContrast.toString());
+    const root = window.document.documentElement;
+    
+    if (highContrast) {
+      root.classList.add('high-contrast');
+    } else {
+      root.classList.remove('high-contrast');
+    }
+  }, [highContrast]);
+
   const value = {
     theme,
     setTheme: (theme: Theme) => {
@@ -80,6 +143,18 @@ export function ThemeProvider({
     accentColor,
     setAccentColor: (color: string) => {
       setAccentColor(color);
+    },
+    fontSize,
+    setFontSize: (size: FontSize) => {
+      setFontSize(size);
+    },
+    reducedMotion,
+    setReducedMotion: (reduced: boolean) => {
+      setReducedMotion(reduced);
+    },
+    highContrast,
+    setHighContrast: (contrast: boolean) => {
+      setHighContrast(contrast);
     },
   };
 
