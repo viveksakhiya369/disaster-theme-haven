@@ -10,7 +10,8 @@ import {
   Phone, 
   Settings, 
   Shield, 
-  Users 
+  Users,
+  PackageCheck
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -74,6 +75,7 @@ const Sidebar = () => {
     "/planning": "Planning",
     "/contacts": "Contacts",
     "/settings": "Settings",
+    "/lending": "Lending",
   };
 
   // Get active item based on current location
@@ -86,6 +88,7 @@ const Sidebar = () => {
     { icon: MapPin, label: "Map View", to: "/map", hasAlert: false },
     { icon: Users, label: "Personnel", to: "/personnel", hasAlert: false },
     { icon: Shield, label: "Resources", to: "/resources", hasAlert: false },
+    { icon: PackageCheck, label: "Lending", to: "/lending", hasAlert: false },
     { icon: FileText, label: "Reports", to: "/reports", hasAlert: false },
     { icon: Calendar, label: "Planning", to: "/planning", hasAlert: false },
     { icon: Phone, label: "Contacts", to: "/contacts", hasAlert: false },
