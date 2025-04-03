@@ -1,3 +1,4 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
@@ -6,8 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { incidentData, responseTimeData, resourceData } from "@/data/mockData";
 import StatisticsCard from "@/components/dashboard/StatisticsCard";
+import EditReportModal from "@/components/reports/EditReportModal";
 
 const ReportsPage = () => {
+  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const mockReports = [
     {
       id: "RPT-2023-001",
@@ -72,6 +77,11 @@ const ReportsPage = () => {
       case "In Review": return "bg-blue-500";
       default: return "bg-gray-500";
     }
+  };
+
+  const handleEditReport = (report: any) => {
+    setSelectedReport(report);
+    setIsEditModalOpen(true);
   };
 
   return (
@@ -176,7 +186,12 @@ const ReportsPage = () => {
                         </td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="h-8">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8"
+                              onClick={() => handleEditReport(report)}
+                            >
                               <Eye className="h-3.5 w-3.5 mr-1" />
                               View
                             </Button>
@@ -194,7 +209,6 @@ const ReportsPage = () => {
             </div>
           </TabsContent>
           
-          {/* Other tabs would follow the same pattern */}
           <TabsContent value="incidents" className="mt-0">
             <div className="p-6 rounded-xl glass">
               <p className="text-center text-muted-foreground">Showing Incident Reports</p>
@@ -302,6 +316,14 @@ const ReportsPage = () => {
           </div>
         </div>
       </div>
+
+      {selectedReport && (
+        <EditReportModal 
+          isOpen={isEditModalOpen} 
+          onClose={() => setIsEditModalOpen(false)} 
+          report={selectedReport} 
+        />
+      )}
     </DashboardLayout>
   );
 };

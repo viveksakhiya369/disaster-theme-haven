@@ -1,12 +1,17 @@
-
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Calendar, Clock, MapPin, Users, CheckCircle, Edit, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import EditEventModal from "@/components/planning/EditEventModal";
+import { toast } from "@/hooks/use-toast";
 
 const PlanningPage = () => {
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const mockEvents = [
     {
       id: "EVT-001",
@@ -84,6 +89,19 @@ const PlanningPage = () => {
     }
   };
 
+  const handleEditEvent = (event: any) => {
+    setSelectedEvent(event);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteEvent = (event: any) => {
+    toast({
+      title: "Event Deleted",
+      description: `${event.title} has been deleted`,
+      variant: "destructive",
+    });
+  };
+
   return (
     <DashboardLayout>
       <Header 
@@ -100,7 +118,6 @@ const PlanningPage = () => {
           </Button>
         </div>
         
-        {/* Calendar Placeholder - In a real application, you'd integrate a full calendar component */}
         <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-xl h-72 flex items-center justify-center mb-6">
           <div className="text-center text-muted-foreground">
             <Calendar className="h-16 w-16 mx-auto mb-2 opacity-30" />
@@ -189,10 +206,20 @@ const PlanningPage = () => {
                         </td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 w-8 p-0"
+                              onClick={() => handleEditEvent(event)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 text-destructive"
+                              onClick={() => handleDeleteEvent(event)}
+                            >
                               <Trash className="h-4 w-4" />
                             </Button>
                           </div>
@@ -408,6 +435,14 @@ const PlanningPage = () => {
           </div>
         </div>
       </div>
+
+      {selectedEvent && (
+        <EditEventModal 
+          isOpen={isEditModalOpen} 
+          onClose={() => setIsEditModalOpen(false)} 
+          event={selectedEvent} 
+        />
+      )}
     </DashboardLayout>
   );
 };

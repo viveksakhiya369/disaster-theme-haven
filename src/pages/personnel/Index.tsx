@@ -1,11 +1,18 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, ArrowUpDown, PhoneCall, Mail, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ProfileModal from "@/components/personnel/ProfileModal";
+import AssignModal from "@/components/personnel/AssignModal";
 
 const PersonnelPage = () => {
+  const [selectedPerson, setSelectedPerson] = useState<any>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+
   const mockPersonnel = [
     {
       id: "EMP-001",
@@ -72,6 +79,16 @@ const PersonnelPage = () => {
       case "Unavailable": return "bg-red-500";
       default: return "bg-gray-500";
     }
+  };
+
+  const handleViewProfile = (person: any) => {
+    setSelectedPerson(person);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleAssign = (person: any) => {
+    setSelectedPerson(person);
+    setIsAssignModalOpen(true);
   };
 
   return (
@@ -163,8 +180,20 @@ const PersonnelPage = () => {
                         </td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm">View Profile</Button>
-                            <Button variant="ghost" size="sm">Assign</Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleViewProfile(person)}
+                            >
+                              View Profile
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleAssign(person)}
+                            >
+                              Assign
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -175,7 +204,6 @@ const PersonnelPage = () => {
             </div>
           </TabsContent>
           
-          {/* Other tab contents would follow the same pattern */}
           <TabsContent value="fire" className="mt-0">
             <div className="p-6 rounded-xl glass">
               <p className="text-center text-muted-foreground">Showing Fire Department personnel</p>
@@ -278,6 +306,21 @@ const PersonnelPage = () => {
           </div>
         </div>
       </div>
+
+      {selectedPerson && (
+        <>
+          <ProfileModal 
+            isOpen={isProfileModalOpen} 
+            onClose={() => setIsProfileModalOpen(false)} 
+            person={selectedPerson} 
+          />
+          <AssignModal 
+            isOpen={isAssignModalOpen} 
+            onClose={() => setIsAssignModalOpen(false)} 
+            person={selectedPerson} 
+          />
+        </>
+      )}
     </DashboardLayout>
   );
 };
