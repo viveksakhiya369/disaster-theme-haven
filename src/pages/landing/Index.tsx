@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -14,12 +13,21 @@ import {
   CheckCircle2,
   HeartPulse,
   Building2,
-  Phone
+  Phone,
+  Mail,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  ChevronRight,
+  Globe
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -283,44 +291,108 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 bg-sidebar-background text-sidebar-foreground">
+      {/* Enhanced Footer */}
+      <footer className="bg-slate-900 text-white pt-16 pb-8">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">DisasterCtrl</h3>
-              <p className="text-sidebar-foreground/80">Comprehensive emergency management system for rapid coordination and effective response.</p>
+          {/* Top Footer Section with Columns */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
+            {/* Company Info Column */}
+            <div className="lg:col-span-2">
+              <h3 className="text-2xl font-bold mb-6 text-white">DisasterCtrl</h3>
+              <p className="text-slate-300 mb-6 max-w-md">
+                Comprehensive emergency management platform enabling rapid coordination, 
+                effective response, and real-time resource allocation during crisis situations.
+              </p>
+              <div className="flex space-x-4">
+                <SocialIcon icon={<Facebook size={18} />} />
+                <SocialIcon icon={<Twitter size={18} />} />
+                <SocialIcon icon={<Instagram size={18} />} />
+                <SocialIcon icon={<Linkedin size={18} />} />
+              </div>
             </div>
+
+            {/* Quick Links Column */}
             <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li><Link to="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link></li>
-                <li><Link to="/alerts" className="hover:text-primary transition-colors">Alerts</Link></li>
-                <li><Link to="/incidents" className="hover:text-primary transition-colors">Incidents</Link></li>
-                <li><Link to="/resources" className="hover:text-primary transition-colors">Resources</Link></li>
+              <h4 className="font-semibold text-lg mb-6 text-white">Quick Links</h4>
+              <ul className="space-y-3">
+                <FooterLink to="/dashboard">Dashboard</FooterLink>
+                <FooterLink to="/alerts">Alerts</FooterLink>
+                <FooterLink to="/incidents">Incidents</FooterLink>
+                <FooterLink to="/resources">Resources</FooterLink>
+                <FooterLink to="/map">Interactive Map</FooterLink>
               </ul>
             </div>
+
+            {/* Features Column */}
             <div>
-              <h4 className="font-semibold mb-4">Features</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-primary transition-colors">Alert Management</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Resource Tracking</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Personnel Coordination</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Reporting</a></li>
+              <h4 className="font-semibold text-lg mb-6 text-white">Features</h4>
+              <ul className="space-y-3">
+                <FooterLink to="#">Alert Management</FooterLink>
+                <FooterLink to="#">Resource Tracking</FooterLink>
+                <FooterLink to="#">Personnel Coordination</FooterLink>
+                <FooterLink to="#">Analytics & Reporting</FooterLink>
+                <FooterLink to="#">API Integration</FooterLink>
               </ul>
             </div>
+
+            {/* Contact Column */}
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
+              <h4 className="font-semibold text-lg mb-6 text-white">Contact Us</h4>
+              <ul className="space-y-4">
+                <li className="flex items-start space-x-3">
+                  <div className="text-primary mt-1"><Phone size={16} /></div>
+                  <span className="text-slate-300">+1 (888) 555-HELP</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="text-primary mt-1"><Mail size={16} /></div>
+                  <span className="text-slate-300">support@disasterctrl.com</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="text-primary mt-1"><Building2 size={16} /></div>
+                  <span className="text-slate-300">123 Emergency Lane, Crisis City, WA 98765</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="text-primary mt-1"><Globe size={16} /></div>
+                  <span className="text-slate-300">www.disasterctrl.com</span>
+                </li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-sidebar-border pt-8 text-center">
-            <p>&copy; {new Date().getFullYear()} DisasterCtrl. All rights reserved.</p>
+
+          {/* Newsletter Signup */}
+          <div className="bg-slate-800 rounded-lg p-6 mb-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between">
+              <div className="mb-4 md:mb-0 md:mr-8">
+                <h4 className="text-xl font-semibold mb-2">Stay Updated</h4>
+                <p className="text-slate-300">Subscribe to our newsletter for the latest updates and features</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input 
+                  type="email" 
+                  placeholder="Your email" 
+                  className="px-4 py-2 rounded bg-slate-700 border border-slate-600 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <Button className="bg-primary hover:bg-primary/90">
+                  Subscribe
+                  <ChevronRight size={16} />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <Separator className="bg-slate-700 mb-8" />
+
+          {/* Bottom Footer Section */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between text-slate-400 text-sm">
+            <div className="mb-4 md:mb-0">
+              <p>&copy; {currentYear} DisasterCtrl. All rights reserved.</p>
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <Link to="#" className="hover:text-primary transition-colors">Terms of Service</Link>
+              <Link to="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
+              <Link to="#" className="hover:text-primary transition-colors">Cookie Policy</Link>
+              <Link to="#" className="hover:text-primary transition-colors">Accessibility</Link>
+            </div>
           </div>
         </div>
       </footer>
@@ -369,6 +441,33 @@ const TestimonialCard = ({ quote, author, position }: {
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+// Footer Link Component
+const FooterLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
+  return (
+    <li>
+      <Link 
+        to={to} 
+        className="text-slate-300 hover:text-primary transition-colors flex items-center group"
+      >
+        <ChevronRight size={16} className="opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+        {children}
+      </Link>
+    </li>
+  );
+};
+
+// Social Icon Component
+const SocialIcon = ({ icon }: { icon: React.ReactNode }) => {
+  return (
+    <a 
+      href="#" 
+      className="bg-slate-800 hover:bg-primary text-white p-2 rounded-full transition-colors duration-300 flex items-center justify-center"
+    >
+      {icon}
+    </a>
   );
 };
 
