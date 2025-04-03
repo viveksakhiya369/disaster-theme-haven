@@ -16,6 +16,7 @@ import PlanningPage from "./pages/planning/Index";
 import ContactsPage from "./pages/contacts/Index";
 import SettingsPage from "./pages/settings/Index";
 import LendingPage from "./pages/lending/Index";
+import LandingPage from "./pages/landing/Index";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +27,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/dashboard" element={<Index />} />
           <Route path="/alerts" element={<AlertsPage />} />
           <Route path="/incidents" element={<IncidentsPage />} />
           <Route path="/map" element={<MapViewPage />} />
