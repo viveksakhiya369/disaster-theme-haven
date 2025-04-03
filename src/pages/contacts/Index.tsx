@@ -1,342 +1,293 @@
+
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Building, Phone, Mail, MapPin, Star, PhoneCall, Send, User } from "lucide-react";
+import { Download, Filter, Plus, Search, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ContactCard from "@/components/contacts/ContactCard";
+import ContactModal from "@/components/contacts/ContactModal";
+import DeleteConfirmationDialog from "@/components/contacts/DeleteConfirmationDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const ContactsPage = () => {
-  const mockContacts = [
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+  
+  // Modal states
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<any>(null);
+  
+  // Mock contacts data
+  const [contacts, setContacts] = useState([
     {
       id: "CON-001",
-      name: "Central Fire Department",
-      type: "Emergency Service",
+      name: "David Williams",
+      role: "Director",
+      type: "NGO",
       primary: true,
-      phone: "+1 (555) 123-4567",
-      email: "fire.central@example.com",
-      address: "123 Main Street, Downtown",
-      contactPerson: "Chief John Smith"
+      phone: "+1 (555) 567-8901",
+      email: "david.williams@example.com",
+      address: "200 Charity Lane, Springfield",
+      contactPerson: "David Williams",
+      organization: "Red Cross Local Chapter"
     },
     {
       id: "CON-002",
-      name: "City General Hospital",
-      type: "Medical Facility",
+      name: "John Smith",
+      role: "Fire Chief",
+      type: "Emergency Services",
       primary: true,
-      phone: "+1 (555) 234-5678",
-      email: "info@citygeneral.example.com",
-      address: "456 Health Avenue, Midtown",
-      contactPerson: "Dr. Emily Johnson"
+      phone: "+1 (555) 123-4567",
+      email: "john.smith@example.com",
+      address: "123 Main St, Springfield",
+      contactPerson: "John Smith",
+      organization: "Central Fire Department"
     },
     {
       id: "CON-003",
-      name: "Police Headquarters",
-      type: "Law Enforcement",
-      primary: true,
-      phone: "+1 (555) 345-6789",
-      email: "police.hq@example.com",
-      address: "789 Justice Road, Civic Center",
-      contactPerson: "Captain Michael Chen"
+      name: "Karen Thompson",
+      role: "Superintendent",
+      type: "Education",
+      primary: false,
+      phone: "+1 (555) 678-9012",
+      email: "karen.thompson@example.com",
+      address: "300 Education Blvd, Springfield",
+      contactPerson: "Karen Thompson",
+      organization: "Springfield School District"
     },
     {
       id: "CON-004",
       name: "City Power & Utilities",
+      role: "Manager",
       type: "Infrastructure",
       primary: false,
       phone: "+1 (555) 456-7890",
       email: "support@citypower.example.com",
       address: "101 Energy Lane, Industrial District",
-      contactPerson: "Sarah Williams"
+      contactPerson: "Sarah Williams",
+      organization: "City Utilities Department"
     },
     {
       id: "CON-005",
-      name: "Red Cross Local Chapter",
-      type: "NGO",
-      primary: false,
-      phone: "+1 (555) 567-8901",
-      email: "redcross.local@example.com",
-      address: "202 Helper Street, Downtown",
-      contactPerson: "David Rodriguez"
+      name: "Michael Chen",
+      role: "Captain",
+      type: "Law Enforcement",
+      primary: true,
+      phone: "+1 (555) 345-6789",
+      email: "michael.chen@example.com",
+      address: "789 Justice Road, Civic Center",
+      contactPerson: "Michael Chen",
+      organization: "Police Headquarters"
     },
     {
       id: "CON-006",
-      name: "Coast Guard Station",
-      type: "Emergency Service",
-      primary: false,
-      phone: "+1 (555) 678-9012",
-      email: "coastguard.station@example.com",
-      address: "303 Harbor Drive, Waterfront",
-      contactPerson: "Lieutenant Lisa Thompson"
+      name: "City General Hospital",
+      role: "Medical Director",
+      type: "Healthcare",
+      primary: true,
+      phone: "+1 (555) 234-5678",
+      email: "info@citygeneral.example.com",
+      address: "456 Health Avenue, Midtown",
+      contactPerson: "Dr. Emily Johnson",
+      organization: "City General Hospital"
     }
-  ];
+  ]);
+
+  // Handle contact operations
+  const handleAddContact = (newContact: any) => {
+    setContacts([...contacts, newContact]);
+    toast({
+      title: "Contact added",
+      description: `${newContact.name} has been added to your contacts.`,
+    });
+  };
+
+  const handleEditContact = (updatedContact: any) => {
+    setContacts(contacts.map(contact => 
+      contact.id === updatedContact.id ? updatedContact : contact
+    ));
+    toast({
+      title: "Contact updated",
+      description: `${updatedContact.name} has been updated successfully.`,
+    });
+  };
+
+  const handleDeleteContact = () => {
+    if (selectedContact) {
+      setContacts(contacts.filter(contact => contact.id !== selectedContact.id));
+      setIsDeleteDialogOpen(false);
+      setSelectedContact(null);
+      toast({
+        title: "Contact deleted",
+        description: `The contact has been removed from your directory.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Filter contacts based on search and active tab
+  const filteredContacts = contacts.filter(contact => {
+    const matchesSearch = contact.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         contact.organization?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         contact.contactPerson.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (activeTab === "all") return matchesSearch;
+    if (activeTab === "favorites") return matchesSearch && contact.primary;
+    return matchesSearch && contact.type.toLowerCase().includes(activeTab.toLowerCase());
+  });
 
   return (
     <DashboardLayout>
       <Header 
         title="Contacts Directory" 
-        subtitle="Access emergency services and critical contacts"
+        subtitle="Manage emergency and organizational contacts"
       />
       
-      <div className="mb-6">
-        <Tabs defaultValue="all" className="w-full">
-          <div className="flex justify-between items-center mb-4">
-            <TabsList>
-              <TabsTrigger value="all">All Contacts</TabsTrigger>
-              <TabsTrigger value="emergency">Emergency Services</TabsTrigger>
-              <TabsTrigger value="medical">Medical Facilities</TabsTrigger>
-              <TabsTrigger value="government">Government</TabsTrigger>
-              <TabsTrigger value="utilities">Utilities</TabsTrigger>
-            </TabsList>
-            <Button className="gap-2">
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Contact Management</h2>
+          <div className="flex gap-2">
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+            <Button onClick={() => setIsAddModalOpen(true)} className="gap-2">
               <Plus className="h-4 w-4" />
               Add Contact
             </Button>
           </div>
-          
-          <TabsContent value="all" className="mt-0">
-            <div className="p-6 rounded-xl glass transition-all duration-300 ease-in-out">
-              <div className="flex justify-between mb-4">
-                <div className="relative w-64">
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Search contacts..." 
-                    className="pl-8"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">Filter</Button>
-                  <Button variant="outline" size="sm">Export</Button>
-                </div>
-              </div>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b text-left">
-                      <th className="pb-2 font-medium">Name</th>
-                      <th className="pb-2 font-medium">Type</th>
-                      <th className="pb-2 font-medium">Contact Person</th>
-                      <th className="pb-2 font-medium">Phone</th>
-                      <th className="pb-2 font-medium">Email</th>
-                      <th className="pb-2 font-medium">Address</th>
-                      <th className="pb-2 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {mockContacts.map((contact) => (
-                      <tr key={contact.id} className="border-b hover:bg-accent/10">
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            {contact.primary && (
-                              <Star className="h-4 w-4 text-amber-500" />
-                            )}
-                            <div>
-                              <div className="font-medium">{contact.name}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {contact.id}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3">{contact.type}</td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-muted-foreground" />
-                            <span>{contact.contactPerson}</span>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-muted-foreground" />
-                            <span>{contact.phone}</span>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-muted-foreground" />
-                            <span>{contact.email}</span>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span className="max-w-[150px] truncate" title={contact.address}>
-                              {contact.address}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                              <PhoneCall className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                              <Send className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </TabsContent>
-          
-          {/* Other tabs would follow the same pattern */}
-          <TabsContent value="emergency" className="mt-0">
-            <div className="p-6 rounded-xl glass">
-              <p className="text-center text-muted-foreground">Showing Emergency Services contacts</p>
-            </div>
-          </TabsContent>
-          <TabsContent value="medical" className="mt-0">
-            <div className="p-6 rounded-xl glass">
-              <p className="text-center text-muted-foreground">Showing Medical Facilities contacts</p>
-            </div>
-          </TabsContent>
-          <TabsContent value="government" className="mt-0">
-            <div className="p-6 rounded-xl glass">
-              <p className="text-center text-muted-foreground">Showing Government contacts</p>
-            </div>
-          </TabsContent>
-          <TabsContent value="utilities" className="mt-0">
-            <div className="p-6 rounded-xl glass">
-              <p className="text-center text-muted-foreground">Showing Utilities contacts</p>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="col-span-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl glass">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-red-100 text-red-800">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <h3 className="text-lg font-medium">Emergency Hotlines</h3>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span>Emergency Services (911)</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span>Fire Department Direct</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span>Medical Emergency</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Poison Control</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 rounded-xl glass">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 text-blue-800">
-                  <Building className="h-5 w-5" />
-                </div>
-                <h3 className="text-lg font-medium">Government Agencies</h3>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span>City Emergency Management</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span>County Sheriff's Office</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span>State Emergency Services</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Federal Emergency Agency</span>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <PhoneCall className="h-3.5 w-3.5 mr-1" />
-                    Call
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         
-        <div className="p-4 rounded-xl glass">
-          <h3 className="text-lg font-medium mb-3">Recent Contacts</h3>
-          <div className="space-y-4">
-            <div className="flex gap-3 items-start border-b pb-3">
-              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-800 font-medium">
-                FD
-              </div>
-              <div>
-                <p className="font-medium">Central Fire Department</p>
-                <p className="text-sm text-muted-foreground">
-                  <Phone className="h-3.5 w-3.5 inline mr-1" />
-                  {mockContacts[0].phone}
-                </p>
-                <p className="text-xs text-muted-foreground">Called 2 hours ago</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start border-b pb-3">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium">
-                PD
-              </div>
-              <div>
-                <p className="font-medium">Police Headquarters</p>
-                <p className="text-sm text-muted-foreground">
-                  <Mail className="h-3.5 w-3.5 inline mr-1" />
-                  {mockContacts[2].email}
-                </p>
-                <p className="text-xs text-muted-foreground">Emailed yesterday</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-800 font-medium">
-                H
-              </div>
-              <div>
-                <p className="font-medium">City General Hospital</p>
-                <p className="text-sm text-muted-foreground">
-                  <Phone className="h-3.5 w-3.5 inline mr-1" />
-                  {mockContacts[1].phone}
-                </p>
-                <p className="text-xs text-muted-foreground">Called 3 days ago</p>
-              </div>
-            </div>
-            <div className="pt-2 border-t mt-4">
-              <Button variant="outline" className="w-full">View All Call History</Button>
-            </div>
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button 
+            variant={activeTab === "all" ? "default" : "outline"} 
+            onClick={() => setActiveTab("all")}
+            className="rounded-full"
+          >
+            All Contacts
+          </Button>
+          <Button 
+            variant={activeTab === "emergency services" ? "default" : "outline"} 
+            onClick={() => setActiveTab("emergency services")}
+            className="rounded-full"
+          >
+            Emergency Services
+          </Button>
+          <Button 
+            variant={activeTab === "healthcare" ? "default" : "outline"} 
+            onClick={() => setActiveTab("healthcare")}
+            className="rounded-full"
+          >
+            Healthcare
+          </Button>
+          <Button 
+            variant={activeTab === "government" ? "default" : "outline"} 
+            onClick={() => setActiveTab("government")}
+            className="rounded-full"
+          >
+            Government
+          </Button>
+          <Button 
+            variant={activeTab === "favorites" ? "default" : "outline"} 
+            onClick={() => setActiveTab("favorites")}
+            className="rounded-full gap-2"
+          >
+            <Star className="h-4 w-4" />
+            Favorites
+          </Button>
+        </div>
+        
+        {/* Search and filter */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search contacts..." 
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
+          <Button variant="outline" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+        </div>
+        
+        {/* Contact cards grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredContacts.map(contact => (
+            <ContactCard 
+              key={contact.id} 
+              contact={contact}
+              onEdit={() => {
+                setSelectedContact(contact);
+                setIsEditModalOpen(true);
+              }}
+              onDelete={() => {
+                setSelectedContact(contact);
+                setIsDeleteDialogOpen(true);
+              }}
+            />
+          ))}
+          
+          {filteredContacts.length === 0 && (
+            <div className="col-span-full py-12 text-center">
+              <h3 className="text-lg font-medium text-muted-foreground mb-2">No contacts found</h3>
+              <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveTab("all");
+                }}
+              >
+                Clear filters
+              </Button>
+            </div>
+          )}
         </div>
       </div>
+      
+      {/* Modals */}
+      <ContactModal 
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleAddContact}
+        mode="add"
+      />
+      
+      {selectedContact && (
+        <ContactModal 
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedContact(null);
+          }}
+          onSave={handleEditContact}
+          contact={selectedContact}
+          mode="edit"
+        />
+      )}
+      
+      {selectedContact && (
+        <DeleteConfirmationDialog 
+          isOpen={isDeleteDialogOpen}
+          onClose={() => {
+            setIsDeleteDialogOpen(false);
+            setSelectedContact(null);
+          }}
+          onConfirm={handleDeleteContact}
+          contactName={selectedContact.name}
+        />
+      )}
     </DashboardLayout>
   );
 };
