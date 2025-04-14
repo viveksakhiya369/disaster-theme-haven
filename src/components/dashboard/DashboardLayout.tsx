@@ -1,20 +1,21 @@
 
-import { ReactNode } from "react";
 import Sidebar from "./Sidebar";
+import DashboardHeader from "./DashboardHeader";
 
 interface DashboardLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="container py-6 max-w-7xl">
+      <div className="flex-1 ml-16 md:ml-64 min-h-screen flex flex-col">
+        <DashboardHeader />
+        <main className="flex-1 p-6">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

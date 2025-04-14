@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -23,6 +24,17 @@ const DeleteConfirmationDialog = ({
   onConfirm,
   contactName,
 }: DeleteConfirmationDialogProps) => {
+  const { toast } = useToast();
+  
+  const handleConfirm = () => {
+    onConfirm();
+    toast({
+      title: "Contact Deleted",
+      description: `${contactName} has been removed from your contacts.`,
+      variant: "destructive",
+    });
+  };
+  
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
@@ -36,7 +48,7 @@ const DeleteConfirmationDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction 
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete

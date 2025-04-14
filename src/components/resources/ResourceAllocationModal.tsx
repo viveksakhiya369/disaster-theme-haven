@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -12,28 +12,26 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-interface AssignModalProps {
+interface ResourceAllocationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  person: {
+  resource: {
     id: string;
     name: string;
-    role: string;
-    department: string;
   };
 }
 
-const AssignModal = ({ isOpen, onClose, person }: AssignModalProps) => {
-  const [task, setTask] = useState("");
+const ResourceAllocationModal = ({ isOpen, onClose, resource }: ResourceAllocationModalProps) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [priority, setPriority] = useState("medium");
+  const [destination, setDestination] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const { toast } = useToast();
 
   const handleSubmit = () => {
-    // Here you would typically call an API to save the assignment
     toast({
-      title: "Personnel Assigned",
-      description: `${person.name} has been assigned to ${task}`,
+      title: "Resource Allocated",
+      description: `${resource.name} has been allocated to ${destination}`,
     });
     onClose();
   };
@@ -42,25 +40,36 @@ const AssignModal = ({ isOpen, onClose, person }: AssignModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Assign Personnel</DialogTitle>
+          <DialogTitle>Allocate Resource</DialogTitle>
           <DialogDescription>
-            Assign {person.name} to a new task or mission
+            Assign {resource.name} to a mission or location
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="task">Task or Mission</Label>
+            <Label htmlFor="quantity">Quantity</Label>
             <Input
-              id="task"
-              placeholder="Enter task description"
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
+              id="quantity"
+              type="number"
+              min={1}
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value))}
             />
           </div>
           
           <div className="grid gap-2">
-            <Label htmlFor="date">Date</Label>
+            <Label htmlFor="destination">Destination/Team</Label>
+            <Input
+              id="destination"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              placeholder="Enter destination or team name"
+            />
+          </div>
+          
+          <div className="grid gap-2">
+            <Label htmlFor="date">Deployment Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -87,18 +96,14 @@ const AssignModal = ({ isOpen, onClose, person }: AssignModalProps) => {
           </div>
           
           <div className="grid gap-2">
-            <Label htmlFor="priority">Priority</Label>
-            <Select value={priority} onValueChange={setPriority}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="urgent">Urgent</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="purpose">Purpose</Label>
+            <Textarea
+              id="purpose"
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              placeholder="Describe the purpose of allocation"
+              rows={3}
+            />
           </div>
         </div>
         
@@ -107,7 +112,7 @@ const AssignModal = ({ isOpen, onClose, person }: AssignModalProps) => {
             Cancel
           </Button>
           <Button onClick={handleSubmit}>
-            Assign
+            Allocate
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -115,4 +120,4 @@ const AssignModal = ({ isOpen, onClose, person }: AssignModalProps) => {
   );
 };
 
-export default AssignModal;
+export default ResourceAllocationModal;

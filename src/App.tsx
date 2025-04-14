@@ -17,6 +17,10 @@ import ContactsPage from "./pages/contacts/Index";
 import SettingsPage from "./pages/settings/Index";
 import LendingPage from "./pages/lending/Index";
 import LandingPage from "./pages/landing/Index";
+import LoginPage from "./pages/auth/Login";
+import RegisterPage from "./pages/auth/Register";
+import ForgotPasswordPage from "./pages/auth/ForgotPassword";
+import SendAlertsPage from "./pages/admin/SendAlerts";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +43,10 @@ const App = () => (
           <Route path="/contacts" element={<ContactsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/lending" element={<LendingPage />} />
+          <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/register" element={<RegisterPage />} />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/admin/alerts" element={<SendAlertsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -11,7 +11,8 @@ import {
   Settings, 
   Shield, 
   Users,
-  PackageCheck
+  PackageCheck,
+  BellRing
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -66,6 +67,7 @@ const Sidebar = () => {
   // Define route paths and their corresponding labels
   const pathToLabel: Record<string, string> = {
     "/": "Dashboard",
+    "/dashboard": "Dashboard",
     "/alerts": "Alerts",
     "/incidents": "Incidents",
     "/map": "Map View",
@@ -76,13 +78,14 @@ const Sidebar = () => {
     "/contacts": "Contacts",
     "/settings": "Settings",
     "/lending": "Lending",
+    "/admin/alerts": "Send Alerts",
   };
 
   // Get active item based on current location
   const activeItem = pathToLabel[location.pathname] || "Dashboard";
 
-  const navItems = [
-    { icon: Home, label: "Dashboard", to: "/", hasAlert: false },
+  const mainNavItems = [
+    { icon: Home, label: "Dashboard", to: "/dashboard", hasAlert: false },
     { icon: Bell, label: "Alerts", to: "/alerts", hasAlert: true },
     { icon: Activity, label: "Incidents", to: "/incidents", hasAlert: false },
     { icon: MapPin, label: "Map View", to: "/map", hasAlert: false },
@@ -92,13 +95,17 @@ const Sidebar = () => {
     { icon: FileText, label: "Reports", to: "/reports", hasAlert: false },
     { icon: Calendar, label: "Planning", to: "/planning", hasAlert: false },
     { icon: Phone, label: "Contacts", to: "/contacts", hasAlert: false },
+  ];
+  
+  const adminNavItems = [
+    { icon: BellRing, label: "Send Alerts", to: "/admin/alerts", hasAlert: false },
     { icon: Settings, label: "Settings", to: "/settings", hasAlert: false },
   ];
 
   return (
     <div 
       className={cn(
-        "h-screen bg-sidebar flex flex-col transition-all duration-300 ease-in-out border-r border-sidebar-border",
+        "h-screen fixed left-0 top-0 bottom-0 bg-sidebar flex flex-col transition-all duration-300 ease-in-out border-r border-sidebar-border overflow-hidden",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -118,7 +125,20 @@ const Sidebar = () => {
         </Button>
       </div>
       <div className="flex-1 overflow-y-auto py-6 px-2 space-y-1">
-        {navItems.map((item) => (
+        {mainNavItems.map((item) => (
+          <NavItem
+            key={item.label}
+            icon={item.icon}
+            label={collapsed ? "" : item.label}
+            to={item.to}
+            active={activeItem === item.label}
+            hasAlert={!collapsed && item.hasAlert}
+          />
+        ))}
+        
+        {!collapsed && <div className="text-xs text-sidebar-foreground/60 px-3 py-2 mt-4">Administration</div>}
+        
+        {adminNavItems.map((item) => (
           <NavItem
             key={item.label}
             icon={item.icon}

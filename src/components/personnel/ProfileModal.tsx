@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Building, Mail, MapPin, Phone, Shield, User, Calendar, Briefcase } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -20,6 +21,15 @@ interface ProfileModalProps {
 }
 
 const ProfileModal = ({ isOpen, onClose, person }: ProfileModalProps) => {
+  const { toast } = useToast();
+
+  const handleContactPersonnel = () => {
+    toast({
+      title: "Contact Initiated",
+      description: `You are now contacting ${person.name}`,
+    });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
@@ -109,7 +119,7 @@ const ProfileModal = ({ isOpen, onClose, person }: ProfileModalProps) => {
           <Button variant="outline" onClick={onClose}>
             Close
           </Button>
-          <Button>Contact Personnel</Button>
+          <Button onClick={handleContactPersonnel}>Contact Personnel</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
