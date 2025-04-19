@@ -59,6 +59,19 @@ const AlertItem = ({
     },
   };
 
+  // Handlers for alert actions
+  const handleDismiss = () => {
+    if (onDismiss) {
+      onDismiss(id);
+    }
+  };
+
+  const handleView = () => {
+    if (onView) {
+      onView(id);
+    }
+  };
+
   return (
     <div 
       className={cn(
@@ -155,7 +168,7 @@ const AlertItem = ({
               variant="outline" 
               size="sm" 
               className="gap-2"
-              onClick={() => onView?.(id)}
+              onClick={handleView}
             >
               <Eye className="h-3.5 w-3.5" />
               <span>View</span>
@@ -163,7 +176,7 @@ const AlertItem = ({
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => onDismiss?.(id)}
+              onClick={handleDismiss}
             >
               <X className="h-3.5 w-3.5" />
               <span>Dismiss</span>

@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Header from "@/components/dashboard/Header";
 import StatusCard from "@/components/dashboard/StatusCard";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 
 const Index = () => {
   const [alerts, setAlerts] = useState(alertsData);
+  const navigate = useNavigate();
 
   const handleDismissAlert = (id: string) => {
     setAlerts(alerts.filter(alert => alert.id !== id));
@@ -19,10 +21,17 @@ const Index = () => {
   };
 
   const handleViewAlert = (id: string) => {
+    // Mark the alert as read
     setAlerts(alerts.map(alert => 
       alert.id === id ? { ...alert, read: true } : alert
     ));
+    
+    // Show toast and navigate to the alert detail page
     toast.info("Opening alert details");
+    
+    // In a real application, you would navigate to a specific alert detail page
+    // For now, we'll navigate to the alerts page
+    navigate("/alerts");
   };
 
   return (
