@@ -32,7 +32,9 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="sticky top-0 z-50 flex justify-end items-center p-4 border-b bg-background">
+    <div className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-background">
+      <h1 className="text-xl font-bold">Disaster Management Dashboard</h1>
+      
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" asChild>
           <Link to="/alerts">
