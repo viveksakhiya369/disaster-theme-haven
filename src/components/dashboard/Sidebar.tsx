@@ -14,7 +14,7 @@ import {
   PackageCheck,
   BellRing
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -60,9 +60,14 @@ const NavItem = ({ icon: Icon, label, to, active, hasAlert, onClick }: NavItemPr
   );
 };
 
-const Sidebar = () => {
+// Define the Sidebar props interface
+interface SidebarProps {
+  setCollapsed: (collapsed: boolean) => void;
+  collapsed: boolean;
+}
+
+const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
 
   // Define route paths and their corresponding labels
   const pathToLabel: Record<string, string> = {
@@ -105,7 +110,7 @@ const Sidebar = () => {
   return (
     <div 
       className={cn(
-        "h-screen fixed left-0 top-0 bottom-0 bg-sidebar flex flex-col transition-all duration-300 ease-in-out border-r border-sidebar-border overflow-hidden",
+        "h-screen fixed left-0 top-0 bottom-0 bg-sidebar flex flex-col transition-all duration-300 ease-in-out border-r border-sidebar-border overflow-hidden z-30",
         collapsed ? "w-16" : "w-64"
       )}
     >

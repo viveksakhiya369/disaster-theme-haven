@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
 
@@ -7,12 +8,12 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   return (
     <div className="min-h-screen flex">
-      <div className="fixed top-0 left-0 h-full z-10">
-        <Sidebar />
-      </div>
-      <div className="flex-1 ml-16 md:ml-64 min-h-screen flex flex-col">
+      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+      <div className={`flex-1 min-h-screen flex flex-col transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
         <DashboardHeader />
         <main className="flex-1 p-6">
           {children}
