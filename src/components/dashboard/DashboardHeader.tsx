@@ -6,7 +6,7 @@ import {
   Settings,
   User
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { 
   DropdownMenu,
@@ -18,8 +18,28 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
+const getPageTitle = (pathname: string): string => {
+  const routes: Record<string, string> = {
+    '/dashboard': 'Disaster Management Dashboard',
+    '/alerts': 'Alerts Management',
+    '/incidents': 'Incident Management',
+    '/map': 'Map View',
+    '/personnel': 'Personnel Management',
+    '/resources': 'Resource Management',
+    '/reports': 'Reports',
+    '/planning': 'Planning',
+    '/contacts': 'Contacts',
+    '/settings': 'Settings',
+    '/lending': 'Resource Lending',
+    '/admin/alerts': 'Send Alerts'
+  };
+
+  return routes[pathname] || 'Disaster Management Dashboard';
+};
+
 const DashboardHeader = () => {
   const { toast } = useToast();
+  const location = useLocation();
   
   const handleLogout = () => {
     toast({
@@ -33,7 +53,7 @@ const DashboardHeader = () => {
 
   return (
     <div className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-background">
-      <h1 className="text-xl font-bold">Disaster Management Dashboard</h1>
+      <h1 className="text-xl font-bold">{getPageTitle(location.pathname)}</h1>
       
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" asChild>
