@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import LoginPage from "./pages/auth/Login";
 import RegisterPage from "./pages/auth/Register";
 import ForgotPasswordPage from "./pages/auth/ForgotPassword";
 import SendAlertsPage from "./pages/admin/SendAlerts";
+import MapView from "./pages/map/MapView";
 
 const queryClient = new QueryClient();
 
@@ -47,7 +47,7 @@ const App = () => (
           <Route path="/auth/register" element={<RegisterPage />} />
           <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/admin/alerts" element={<SendAlertsPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/map/view" element={<MapView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -397,6 +396,18 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* New Map Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Real-time Disaster Alerts
+          </h2>
+          <div className="w-full mx-auto">
+            <SimplifiedMap />
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
