@@ -27,14 +27,16 @@ const RegisterPage = () => {
       return;
     }
     
-    // Here you would typically handle registration
+    // Store email for verification page
+    localStorage.setItem('pendingVerificationEmail', email);
+    
     toast({
       title: "Registration Successful",
-      description: "Your account has been created",
+      description: "Please check your email for verification link",
     });
     
-    // Redirect to login page after registration
-    window.location.href = "/auth/login";
+    // Redirect to verification page instead of login
+    window.location.href = "/auth/verify-email";
   };
 
   return (

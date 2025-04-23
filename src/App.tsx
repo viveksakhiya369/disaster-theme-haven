@@ -21,6 +21,7 @@ import RegisterPage from "./pages/auth/Register";
 import ForgotPasswordPage from "./pages/auth/ForgotPassword";
 import SendAlertsPage from "./pages/admin/SendAlerts";
 import MapView from "./pages/map/MapView";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/admin/alerts" element={<SendAlertsPage />} />
           <Route path="/map/view" element={<MapView />} />
+          <Route path="/auth/verify-email" element={<VerifyEmail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
