@@ -23,6 +23,7 @@ import SendAlertsPage from "./pages/admin/SendAlerts";
 import MapView from "./pages/map/MapView";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import DepartmentLoginPage from "./pages/auth/DepartmentLogin";
+import DepartmentDashboard from "./pages/department/DepartmentDashboard";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/map/view" element={<MapView />} />
           <Route path="/auth/verify-email" element={<VerifyEmail />} />
           <Route path="/auth/department-login" element={<DepartmentLoginPage />} />
+          <Route path="/department/dashboard" element={<DepartmentDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

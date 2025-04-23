@@ -19,7 +19,7 @@ const DepartmentLoginPage = () => {
       title: "Login Successful",
       description: "You are now logged in",
     });
-    window.location.href = "/dashboard";
+    window.location.href = "/department/dashboard";
   };
 
   return (
