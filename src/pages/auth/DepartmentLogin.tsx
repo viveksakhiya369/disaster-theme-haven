@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 
-const LoginPage = () => {
+const DepartmentLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -15,12 +15,10 @@ const LoginPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically handle authentication
     toast({
       title: "Login Successful",
       description: "You are now logged in",
     });
-    // Redirect to dashboard after login
     window.location.href = "/dashboard";
   };
 
@@ -29,16 +27,16 @@ const LoginPage = () => {
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-md">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Disaster<span className="text-primary">Ctrl</span></h1>
-          <h2 className="mt-2 text-xl font-semibold">Sign in to your account</h2>
+          <h2 className="mt-2 text-xl font-semibold">Department Login</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Enter your credentials to access the dashboard
+            Enter your department credentials
           </p>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="email">Email address</Label>
+              <Label htmlFor="email">Department Email</Label>
               <Input
                 id="email"
                 name="email"
@@ -48,7 +46,7 @@ const LoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1"
-                placeholder="your.email@example.com"
+                placeholder="department@example.com"
               />
             </div>
             
@@ -89,18 +87,10 @@ const LoginPage = () => {
             Sign in
           </Button>
           
-          <div className="space-y-2 text-center text-sm">
-            <div>
-              <span className="text-muted-foreground">Don't have an account? </span>
-              <Link to="/auth/register" className="text-primary hover:underline">
-                Create an account
-              </Link>
-            </div>
-            <div>
-              <Link to="/auth/department-login" className="text-primary hover:underline">
-                Department Login
-              </Link>
-            </div>
+          <div className="text-center text-sm">
+            <Link to="/auth/login" className="text-primary hover:underline">
+              Back to regular login
+            </Link>
           </div>
         </form>
       </div>
@@ -108,4 +98,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default DepartmentLoginPage;
