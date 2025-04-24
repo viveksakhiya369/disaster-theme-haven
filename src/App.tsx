@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,7 @@ import LoginPage from "./pages/auth/Login";
 import RegisterPage from "./pages/auth/Register";
 import ForgotPasswordPage from "./pages/auth/ForgotPassword";
 import SendAlertsPage from "./pages/admin/SendAlerts";
+import DepartmentsPage from "./pages/admin/Departments";
 import MapView from "./pages/map/MapView";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import DepartmentLoginPage from "./pages/auth/DepartmentLogin";
